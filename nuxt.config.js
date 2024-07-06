@@ -1,19 +1,17 @@
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'tickop',
+    title: "tickop",
     htmlAttrs: {
-      lang: 'en'
+      lang: "en",
     },
     meta: [
-      { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' },
-      { name: 'format-detection', content: 'telephone=no' }
+      { charset: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { hid: "description", name: "description", content: "" },
+      { name: "format-detection", content: "telephone=no" },
     ],
-    link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
-    ]
+    link: [{ rel: "icon", type: "image/x-icon", href: "/favicon.ico" }],
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
@@ -21,7 +19,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
-    "~/plugins/ant-design-vue.js"
+    "~/plugins/ant-design-vue.js",
     // "~/plugins/axios.js",
     // "~/plugins/vuelidate.js",
 
@@ -49,20 +47,18 @@ export default {
 
   // Modules for dev and build (recommended): https://go.nuxtjs.dev/config-modules
 
-
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
-    '@nuxtjs/axios',
-    '@nuxtjs/auth-next',
+    "@nuxtjs/axios",
+    "@nuxtjs/auth-next",
     "@nuxtjs/i18n",
     "portal-vue/nuxt",
-
   ],
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
 
   build: {
-    transpile: ['ant-design-vue']
+    transpile: ["ant-design-vue"],
   },
   i18n: {
     // locales: [
@@ -91,13 +87,13 @@ export default {
   ssr: false,
   axios: {
     proxy: true,
-    credentials: true
+    credentials: true,
   },
   proxy: {
-    '/laravel': {
-      target: 'https://2573-118-70-146-171.ngrok-free.app/api/',
-      pathRewrite: { '^/laravel': '/' }
-    }
+    "/laravel": {
+      target: "https://2573-118-70-146-171.ngrok-free.app/api/",
+      pathRewrite: { "^/laravel": "/" },
+    },
   },
 
   auth: {
@@ -105,18 +101,16 @@ export default {
       login: "/login/",
       logout: "/login/",
       home: "/",
-
     },
     strategies: {
       laravelSanctum: {
         // scheme: "~/strategies/cookie",
-        provider: 'laravel/sanctum',
-        url: '/laravel',
+        provider: "laravel/sanctum",
+        url: "/laravel",
         endpoints: {
           // (optional) If set, we send a get request to this endpoint before login
           csrf: {
-            url: '/csrf-cookie'
-
+            url: "/csrf-cookie",
           },
           login: {
             url: `/auth/login/`,
@@ -130,11 +124,11 @@ export default {
             url: "/auth/user/two-factor-authentication",
             method: "post",
           },
-        }
+        },
       },
     },
   },
   router: {
-    middleware: ["auth"],
-  }
-}
+    // middleware: ["auth"],
+  },
+};
