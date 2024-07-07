@@ -1,5 +1,5 @@
 <template>
-  <desktop />
+  <div>Thông tin cá nhân</div>
 </template>
 
 <script>
