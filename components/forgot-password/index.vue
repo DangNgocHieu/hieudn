@@ -39,9 +39,8 @@
           <a-form-item>
             <div class="custom-button-antd">
               <a-button
-                type="primary"
                 html-type="submit"
-                class="login-form-button"
+                class="btn-submit"
                 :disabled="hasErrors(form.getFieldsError())"
               >
                 Gửi
@@ -174,5 +173,18 @@ ul {
   width: 100%;
   justify-content: space-between;
   align-items: center;
+}
+.btn-submit {
+  background: green;
+  color: #fff;
+  border-color: green;
+  &:hover {
+    background: green;
+    color: #fff;
+  }
+  &:focus {
+    background: green;
+    color: #fff;
+  }
 }
 </style>

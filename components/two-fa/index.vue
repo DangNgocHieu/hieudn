@@ -1,24 +1,34 @@
 <template>
   <div class="two-fa">
     <a-card title="Bảo mật 2 lớp">
-      <a-form-model ref="ruleForm" :model="form" :rules="rules">
-        <a-form-model-item ref="dataTowFa" label="OTP" prop="dataTowFa">
-          <a-input :maxLength="6" v-model="dataTowFa"></a-input>
-        </a-form-model-item>
-        <a-button
-          :style="'margin-top:20px'"
-          :disabled="isDisableOTP || this.dataTowFa?.length < 6"
-          >Xác nhận</a-button
-        >
-      </a-form-model>
+      <OtpInput
+        ref="otpInput"
+        input-classes="otp-input"
+        separator="-"
+        :num-inputs="6"
+        :should-auto-focus="true"
+        :is-input-num="true"
+        @on-change="handleOnChange"
+        @on-complete="handleOnComplete"
+      />
+      <a-button
+        :style="'margin-top:20px'"
+        :disabled="this.dataTowFa?.length < 6"
+        >Xác nhận</a-button
+      >
     </a-card>
   </div>
 </template>
 
 <script>
+import OtpInput from "@bachdgvn/vue-otp-input";
+
 import { mapFields } from "vuex-map-fields";
 
 export default {
+  components: {
+    OtpInput,
+  },
   computed: {
     ...mapFields({
       form: "towfa.form",
@@ -37,28 +47,29 @@ export default {
     },
   },
   data() {
-    return {
-      rules: {
-        dataTowFa: [
-          {
-            required: true,
-            message: "Vui lòng nhập otp",
-            trigger: "change",
-          },
-          {
-            pattern: /^[0-9]*$/,
-            message: "Vui lòng nhập đúng định dạng otp",
-            trigger: "change",
-          },
-          ,
-        ],
-      },
-    };
+    return {};
+  },
+  methods: {
+    handleOnComplete(value) {
+      this.dataTowFa = value;
+    },
+    handleOnChange(value) {
+      this.dataTowFa = value;
+    },
   },
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
+.otp-input {
+  width: 40px;
+  height: 40px;
+  padding: 5px;
+  margin: 0 10px;
+  font-size: 20px;
+  border-radius: 4px;
+  text-align: center;
+}
 .two-fa {
   min-width: 26rem;
 }

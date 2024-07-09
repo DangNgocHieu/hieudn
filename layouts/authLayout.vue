@@ -16,7 +16,7 @@
       </div>
       <Nuxt />
     </div>
-    <Notify />
+    <notify />
   </div>
 </template>
 

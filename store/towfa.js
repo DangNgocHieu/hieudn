@@ -2,7 +2,7 @@ import { getField, updateField } from "vuex-map-fields";
 import { cloneDeep } from "lodash";
 const INIT_STATE = {
     form: {
-        dataTowFa: null
+        dataTowFa: ""
     },
     isDisableOTP: false
 };

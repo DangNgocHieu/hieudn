@@ -12,8 +12,8 @@
           <div class="custom-button-antd">
             <a-button
               :disabled="isDisableSubmit"
-              type="primary"
               @click="handleSubmit"
+              class="btn-submit"
             >
               Đăng nhập
             </a-button>
@@ -25,7 +25,9 @@
         <a-form-model-item>
           <div class="custom-button-signup">
             <span @click="goToForgot"> Bạn chưa có tài khoản </span>
-            <a-button type="primary" @click="goToSignUp"> Đăng ký </a-button>
+            <a-button @click="goToSignUp" class="btn-submit">
+              Đăng ký
+            </a-button>
           </div>
         </a-form-model-item>
       </a-form-model>
@@ -236,5 +238,18 @@ input {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+.btn-submit {
+  background: green;
+  color: #fff;
+  border-color: green;
+  &:hover {
+    background: green;
+    color: #fff;
+  }
+  &:focus {
+    background: green;
+    color: #fff;
+  }
 }
 </style>

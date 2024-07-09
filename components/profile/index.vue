@@ -7,13 +7,13 @@
         :show-upload-list="false"
         :before-upload="beforeUpload"
         @change="handleUpdateAvatar"
-        @preview="handlePreview"
+        :disabled="!isChange"
       >
-        <div>
+        <!-- <div>
           <div v-if="imageUrl" class="image-parent">
             <img :src="imageUrl" alt="" width="102" height="102" />
             <div class="image-child">
-              <a-icon type="eye" class="icon-eye" />
+              <a-icon type="eye" class="icon-eye" @click="handlePreview" />
               <a-icon class="icon-delete" type="delete" />
             </div>
           </div>
@@ -21,8 +21,16 @@
             <a-icon :type="loading ? 'loading' : 'plus'" />
             <div class="ant-upload-text">Upload</div>
           </div>
+        </div> -->
+        <img :src="imageUrl" alt="" width="102" height="102" v-if="imageUrl" />
+        <div v-else>
+          <a-icon :type="loading ? 'loading' : 'plus'" />
+          <div class="ant-upload-text">Upload</div>
         </div>
       </a-upload>
+      <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancel">
+        <img alt="example" style="width: 100%" :src="imageUrl" />
+      </a-modal>
     </a-card>
     <a-card title="Trạng thái tài khoản">
       <span>Đã kích hoạt</span>
@@ -246,22 +254,19 @@ export default {
       this.previewVisible = false;
     },
     handlePreview(file) {
-      this.previewImage = file.url || file.thumbUrl;
       this.previewVisible = true;
     },
 
     ongChangeProfile() {
-      console.log("1");
       this.isChange = !this.isChange;
     },
-    onSubmit() {
-      console.log("2");
-    },
+    onSubmit() {},
     handleChange(el, e) {
       this[el] = e.target.value;
       // this.$store.commit("profile/")
     },
     handleUpdateAvatar(info) {
+      console.log("2");
       if (info.file.status === "uploading") {
         this.loading = true;
         return;
