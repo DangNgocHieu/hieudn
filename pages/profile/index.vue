@@ -1,5 +1,5 @@
 <template>
-  <div>Thông tin cá nhân</div>
+  <Profile />
 </template>
 
 <script>

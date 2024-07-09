@@ -1,5 +1,5 @@
 <template>
-  <div>Các chứng chỉ quỹ</div>
+  <funds />
 </template>
 
 <script>

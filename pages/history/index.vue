@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="header-history">
-      <a-page-header title="Lịch sử giao dịch" />
+      <h1>Lịch sử giao dịch</h1>
       <a-select
         placeholder="Sắp xếp"
         style="min-width: 120px"
@@ -12,7 +12,11 @@
         <a-select-option value="3"> yiminghe </a-select-option>
       </a-select>
     </div>
-    <a-table :columns="columns" :data-source="data">
+    <a-table
+      :columns="columns"
+      :data-source="data"
+      :style="'background-color:#fff'"
+    >
       <a slot="name" slot-scope="text">{{ text }}</a>
       <a slot="status" slot-scope="status"
         ><a-tag :color="getStatus(status).color">

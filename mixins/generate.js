@@ -18,5 +18,11 @@ export default {
       let characterTrimSpace2 = characterTrimTab?.replace(/\s/g, to);
       return characterTrimSpace2?.replace(/ +/g, to);
     },
+    openNotificationWithIcon(type, mess) {
+      this.$notification[type]({
+        message: type === 'success' ? 'Thành công' : 'Lỗi',
+        description: mess,
+      });
+    },
   },
 };
