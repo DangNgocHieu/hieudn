@@ -2,7 +2,7 @@
   <div class="ekyc-box">
     <p>Xác minh danh tính của bạn bằng cách tải ảnh CCCD</p>
     <a-progress :percent="percent" />
-    <div v-if="percent == 0" class="box-img">
+    <div v-if="!step" class="box-img">
       <p class="text">Mặt trước</p>
       <a-upload
         name="avatar"
@@ -46,16 +46,16 @@
     </div>
 
     <div class="btn-submit">
-      <a-button @click="handleNextStatus">{{
-        percent >= 50 ? "Trước" : "Đăng xuất"
+      <a-button @click="handleBackStatus">{{
+        percent >= 50 && step === 1 ? "Trước" : "Đăng xuất"
       }}</a-button>
       <a-button
-        @click="handleBackStatus"
+        @click="handleConfirm"
         :disabled="percent != 100"
-        v-if="percent >= 50"
+        v-if="percent >= 50 && step === 1"
         >Hoàn tất</a-button
       >
-      <a-button @click="handleBackStatus" :disabled="percent === 0" v-else
+      <a-button @click="handleNextStatus" :disabled="percent === 0" v-else
         >Tiếp</a-button
       >
     </div>
@@ -71,6 +71,7 @@ export default {
       imageUrlBack: "",
       percent: 0,
       isStatus: "",
+      step: 0,
     };
   },
   methods: {
@@ -85,6 +86,7 @@ export default {
           this.imageUrlFont = imageUrl;
           this.loading = false;
           this.percent = 50;
+          this.step = 1;
         });
       }
     },
@@ -109,14 +111,18 @@ export default {
       reader.addEventListener("load", () => callback(reader.result));
       reader.readAsDataURL(img);
     },
+    // truoc, dang xuat
+    handleBackStatus() {
+      this.step = 0;
+    },
+    //tiep
     handleNextStatus() {
-      if (!this.percent) {
-        //logout
-      } else {
-        this.percent = 0;
+      if (this.imageUrlFont) {
+        this.step = 1;
       }
     },
-    handleBackStatus() {},
+    //hoan tat
+    handleConfirm() {},
   },
 };
 </script>

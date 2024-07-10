@@ -152,17 +152,17 @@ h2 {
   padding: 20px;
   box-sizing: border-box;
 }
-.btn-submit {
-  background: green;
-  color: #fff;
-  border-color: green;
-  &:hover {
-    background: green;
-    color: #fff;
-  }
-  &:focus {
-    background: green;
-    color: #fff;
-  }
-}
+// .btn-submit {
+//   background: green;
+//   color: #fff;
+//   border-color: green;
+//   &:hover {
+//     background: green;
+//     color: #fff;
+//   }
+//   &:focus {
+//     background: green;
+//     color: #fff;
+//   }
+// }
 </style>

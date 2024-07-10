@@ -239,17 +239,17 @@ input {
   flex-direction: column;
   align-items: center;
 }
-.btn-submit {
-  background: green;
-  color: #fff;
-  border-color: green;
-  &:hover {
-    background: green;
-    color: #fff;
-  }
-  &:focus {
-    background: green;
-    color: #fff;
-  }
-}
+// .btn-submit {
+//   background: green;
+//   color: #fff;
+//   border-color: green;
+//   &:hover {
+//     background: green;
+//     color: #fff;
+//   }
+//   &:focus {
+//     background: green;
+//     color: #fff;
+//   }
+// }
 </style>

@@ -30,12 +30,7 @@
         </a-form-model-item>
       </div>
       <a-form-model-item>
-        <a-button
-          type="primary"
-          html-type="submit"
-          class="btn-submit"
-          @click="handleSubmit"
-        >
+        <a-button class="btn-submit" @click="handleSubmit">
           Tính toán
         </a-button>
       </a-form-model-item>
@@ -102,13 +97,13 @@ export default {
 .form-item {
   width: 100%;
 }
-.btn-submit {
-  background: green;
-  color: #fff;
-  border-color: green;
-  &:hover {
-    background: green;
-    color: #fff;
-  }
-}
+// .btn-submit {
+//   background: green;
+//   color: #fff;
+//   border-color: green;
+//   &:hover {
+//     background: green;
+//     color: #fff;
+//   }
+// }
 </style>

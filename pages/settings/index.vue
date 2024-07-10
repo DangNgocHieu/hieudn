@@ -28,7 +28,7 @@
           <a-input-password v-model="ruleForm.confirmNewPassword" />
         </a-form-model-item>
         <a-form-model-item :wrapper-col="{ span: 14, offset: 4 }">
-          <a-button type="primary" class="btn-submit" @click="handleSubmit">
+          <a-button class="btn-submit" @click="handleSubmit">
             Đổi mật khẩu
           </a-button>
         </a-form-model-item>
@@ -40,6 +40,10 @@
       @ok="handleOk"
       okText="Xác nhận"
       @cancel="handleCancel"
+      :okButtonProps="{
+        class: dataOTP.length < 6 ? '' : 'btn-submit',
+        props: { disabled: dataOTP.length < 6 },
+      }"
     >
       <p>Từ ứng dụng đã tải xuống, hãy quét mã QR</p>
       <img src="" />
@@ -75,6 +79,7 @@ export default {
       wrapperCol: { span: 8 },
       isCheckbox: 1,
       isShowModal: false,
+      dataOTP: "",
       radioStyle: {
         display: "block",
         height: "30px",
@@ -126,9 +131,12 @@ export default {
       this.isCheckbox = 1;
     },
     handleOnComplete(value) {
+      this.dataOTP = value;
       console.log("OTP completed: ", value);
     },
     handleOnChange(value) {
+      this.dataOTP = value;
+
       console.log("OTP changed: ", value);
     },
   },

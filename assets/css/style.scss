@@ -4,6 +4,23 @@ body {
   font-size: 14px;
 }
 
-.mb-4{ 
+.mb-4 {
   margin-bottom: 16px !important;
+}
+.btn-submit {
+  background: green !important;
+  color: #fff !important;
+  border-color: green !important;
+  &:hover {
+    background: green !important;
+    color: #fff !important;
+  }
+  &:focus {
+    background: green !important;
+    color: #fff !important;
+  }
+  &:active {
+    background: green !important;
+    color: #fff !important;
+  }
 }

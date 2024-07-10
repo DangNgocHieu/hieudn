@@ -310,14 +310,14 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.btn-submit {
-  background: green;
-  color: #fff;
-  &:hover {
-    background: green;
-    color: #fff;
-  }
-}
+// .btn-submit {
+//   background: green;
+//   color: #fff;
+//   &:hover {
+//     background: green;
+//     color: #fff;
+//   }
+// }
 .icon-eye {
   // max-height: 200px;
   padding-right: 10px;
