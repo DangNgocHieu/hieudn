@@ -64,6 +64,7 @@
         <div>
           <canvas id="myChart"></canvas>
         </div>
+        <br />
       </div>
       <div class="invest_customize_detail">
         <br />
@@ -124,6 +125,11 @@ export default {
       isOpenModal: "customize.isOpenModal",
       moneyAmount: "customize.moneyAmount",
     }),
+    dataChart() {
+      return this.dataDetail?.allocation.map((el) => {
+        return el.percentage;
+      });
+    },
   },
   data() {
     return {
@@ -168,30 +174,9 @@ export default {
       ],
     };
   },
-  async mounted() {
-    var ctx = document.getElementById("myChart");
-    var myChart = new Chart(ctx, {
-      type: "pie",
-      data: {
-        labels: ["Red", "Orange", "Yellow"],
-        datasets: [
-          {
-            label: "My First dataset",
-            backgroundColor: "rgb(255, 99, 132),rgb(255, 99, 0)",
-            borderColor: "rgb(255, 99, 132)",
-            data: [10, 20, 30, 40],
-          },
-        ],
-      },
-      options: {
-        scales: {
-          y: {
-            beginAtZero: true,
-          },
-        },
-      },
-    });
 
+  async mounted() {
+    this.createChart();
     this.$store.commit("SET_LOADING", true);
     const res = await this.$axios.get(
       `laravel/packages/${this.$route.params.id}`,
@@ -203,6 +188,34 @@ export default {
     }
   },
   methods: {
+    createChart() {
+      var ctx = document.getElementById("myChart");
+      this.myChart = new Chart(ctx, {
+        type: "doughnut",
+        data: {
+          labels: ["Red", "Blue", "Yellow"],
+          datasets: [
+            {
+              data: this.dataChart,
+              backgroundColor: [
+                "rgb(255, 99, 132)",
+                "rgb(54, 162, 235)",
+                "rgb(255, 205, 86)",
+              ],
+              hoverOffset: 4,
+            },
+          ],
+        },
+        options: {
+          scales: {
+            x: {
+              display: false,
+            },
+          },
+        },
+      });
+      // this.myChart.resize(100, 200);
+    },
     showModal() {
       this.$store.commit("customize/SET_IS_OPEN_MODAL", !this.isOpenModal);
     },
@@ -250,4 +263,8 @@ export default {
   .invest_customize_detail--title {
   }
 }
+// canvas {
+//   max-height: 300px;
+//   max-width: 300px;
+// }
 </style>

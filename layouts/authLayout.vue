@@ -16,7 +16,6 @@
       </div>
       <Nuxt />
     </div>
-    <notify />
   </div>
 </template>
 

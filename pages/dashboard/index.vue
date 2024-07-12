@@ -3,7 +3,11 @@
 </template>
 
 <script>
-export default {};
+export default {
+  middleware({ $auth, redirect }) {
+    // redirect("/ekyc");
+  },
+};
 </script>
 
 <style lang="scss" scoped></style>

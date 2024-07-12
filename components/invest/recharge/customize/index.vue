@@ -16,7 +16,7 @@
       >
     </a-breadcrumb>
     <a-card>
-      <div class="customize__item">
+      <div class="customize__item" @click="gotoCreate">
         <div>
           <a-icon
             type="plus-circle-o"
@@ -72,6 +72,9 @@ export default {
         this.$store.commit("customize/SET_DATA_CUSTOMIZE", res?.data?.data);
       }
     },
+    gotoCreate() {
+      this.$router.push("/invest/recharge/customize/create");
+    },
   },
 };
 </script>
@@ -89,6 +92,7 @@ h3 {
   display: flex;
   flex-direction: row;
   align-items: center;
+  cursor: pointer;
 }
 .customize--text {
   padding-left: 20px;

@@ -66,11 +66,38 @@
 </template>
 
 <script>
+import generate from "../../mixins/generate";
+
 export default {
   components: {},
+  mixins: [generate],
+  data() {
+    return {
+      assetInvest: null,
+    };
+  },
+  mounted() {
+    this.getAssetInvest();
+  },
   methods: {
     handleNextRecharge() {
       this.$router.push("/invest/recharge");
+    },
+    async getAssetInvest() {
+      try {
+        this.$store.commit("SET_LOADING", true);
+        const res = await this.$axios.get("/laravel/me/assets");
+        console.log(res.data.data);
+        if (res.data.data) {
+          this.$store.commit("SET_LOADING", false);
+          this.assetInvest = res.data.data;
+        } else {
+          this.$store.commit("SET_LOADING", false);
+        }
+      } catch (error) {
+        console.log(error);
+        this.$store.commit("SET_LOADING", false);
+      }
     },
   },
 };

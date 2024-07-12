@@ -45,17 +45,22 @@
       </a-upload>
     </div>
 
-    <div class="btn-submit">
-      <a-button @click="handleBackStatus">{{
+    <div class="btn-submit-parent">
+      <a-button @click="handleBackStatus" class="btn-submit">{{
         percent >= 50 && step === 1 ? "Trước" : "Đăng xuất"
       }}</a-button>
       <a-button
         @click="handleConfirm"
         :disabled="percent != 100"
+        class="btn-submit"
         v-if="percent >= 50 && step === 1"
         >Hoàn tất</a-button
       >
-      <a-button @click="handleNextStatus" :disabled="percent === 0" v-else
+      <a-button
+        class="btn-submit"
+        @click="handleNextStatus"
+        :disabled="percent === 0"
+        v-else
         >Tiếp</a-button
       >
     </div>
@@ -63,6 +68,7 @@
 </template>
 
 <script>
+import generate from "../../mixins/generate";
 export default {
   components: {},
   data() {
@@ -74,8 +80,11 @@ export default {
       step: 0,
     };
   },
+  mixins: [generate],
   methods: {
-    handleChangeFont(info) {
+    async handleChangeFont(info) {
+      console.log(info.file, "aaa");
+
       if (info.file.status === "uploading") {
         this.loading = true;
         return;
@@ -104,16 +113,63 @@ export default {
         });
       }
     },
-    beforeUploadFont() {},
-    beforeUploadBack() {},
+    async beforeUploadFont(file) {
+      try {
+        this.$store.commit("SET_LOADING", true);
+        let formData = new FormData();
+        formData.append("image", file);
+        console.log(formData);
+        const res = await this.$axios.post(
+          "/laravel/me/kyc/identity_image_front",
+          formData,
+        );
+        if (res) {
+          console.log(res);
+          this.$store.commit("SET_LOADING", false);
+        } else {
+          this.$store.commit("SET_LOADING", false);
+        }
+      } catch (error) {
+        this.$store.commit("SET_LOADING", false);
+      }
+    },
+    async beforeUploadBack(file) {
+      try {
+        this.$store.commit("SET_LOADING", true);
+        let formData = new FormData();
+        formData.append("image", file);
+        const res = await this.$axios.post(
+          "/laravel/me/kyc/identity_image_back",
+          formData,
+        );
+        if (res) {
+          console.log(res);
+          this.$store.commit("SET_LOADING", false);
+        } else {
+          this.$store.commit("SET_LOADING", false);
+        }
+      } catch (error) {
+        this.$store.commit("SET_LOADING", false);
+      }
+    },
     getBase64(img, callback) {
       const reader = new FileReader();
       reader.addEventListener("load", () => callback(reader.result));
       reader.readAsDataURL(img);
     },
     // truoc, dang xuat
-    handleBackStatus() {
-      this.step = 0;
+    async handleBackStatus() {
+      try {
+        this.$store.commit("SET_LOADING", true);
+        if (this.percent == 0 && this.step === 0) {
+          // await this.$axios.post("/laravel/logout");
+          await this.$auth.logout();
+        }
+        this.$store.commit("SET_LOADING", false);
+        this.step = 0;
+      } catch (error) {
+        this.$store.commit("SET_LOADING", false);
+      }
     },
     //tiep
     handleNextStatus() {
@@ -122,7 +178,28 @@ export default {
       }
     },
     //hoan tat
-    handleConfirm() {},
+    async handleConfirm() {
+      console.log("111");
+      try {
+        this.$store.commit("SET_LOADING", true);
+        const res = await this.$axios.post("/laravel/me/kyc/verify");
+        if (res) {
+          this.$store.commit("SET_LOADING", false);
+
+          this.openNotificationWithIcon(
+            "success",
+            "Bạn đã xác thực thành công",
+          );
+          this.$router.push("/dashboard");
+        } else {
+          this.$store.commit("SET_LOADING", false);
+          this.openNotificationWithIcon("success", "Bạn đã xác thực thất bại");
+        }
+      } catch (error) {
+        console.log(error);
+        this.$store.commit("SET_LOADING", false);
+      }
+    },
   },
 };
 </script>
@@ -135,7 +212,7 @@ export default {
   padding: 20px;
   box-sizing: border-box;
 }
-.btn-submit {
+.btn-submit-parent {
   display: flex;
   flex-direction: row;
   justify-content: space-between;

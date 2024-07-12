@@ -12,9 +12,9 @@
             autocomplete="off"
           />
         </a-form-model-item>
-        <a-form-model-item label="Xác nhận mật khẩu" prop="checkPass">
+        <a-form-model-item label="Xác nhận mật khẩu" prop="confirmPass">
           <a-input-password
-            v-model="checkPass"
+            v-model="confirmPass"
             type="password"
             autocomplete="off"
           />
@@ -46,7 +46,7 @@ export default {
       form: "login.form",
       email: "login.form.email",
       password: "login.form.password",
-      checkPass: "login.form.checkPass",
+      confirmPass: "login.form.confirmPass",
       isDisableSubmit: "login.isDisableSubmit",
     }),
   },
@@ -55,7 +55,6 @@ export default {
     form: {
       handler() {
         this.$refs.ruleForm?.validate((valid) => {
-          console.log(valid, "bbbb");
           this.isDisableSubmit = !valid;
         });
       },
@@ -86,8 +85,8 @@ export default {
               if (value.length < 8) {
                 callback(new Error("Nhập mật khẩu lớn hơn 8 kí tự"));
               } else {
-                if (this.form.checkPass !== "") {
-                  this.$refs.ruleForm.validateField("checkPass");
+                if (this.form.confirmPass !== "") {
+                  this.$refs.ruleForm.validateField("confirmPass");
                 }
                 callback();
               }
@@ -95,7 +94,7 @@ export default {
             trigger: "change",
           },
         ],
-        checkPass: [
+        confirmPass: [
           {
             required: true,
             message: "Vui lòng nhập mật khẩu",
@@ -121,8 +120,22 @@ export default {
     };
   },
   methods: {
-    handleSubmit() {
-      console.log("1111");
+    async handleSubmit() {
+      try {
+        this.$store.commit("SET_LOADING", true);
+        const res = await this.$axios.post("/laravel/auth/register", {
+          email: this.email,
+          password: this.password,
+          password_confirmation: this.confirmPass,
+        });
+        if (res) {
+          this.$store.commit("SET_LOADING", false);
+        } else {
+          this.$store.commit("SET_LOADING", false);
+        }
+      } catch (error) {
+        this.$store.commit("SET_LOADING", false);
+      }
     },
     goToSignUp() {
       this.$router.push("/login");
@@ -152,17 +165,4 @@ h2 {
   padding: 20px;
   box-sizing: border-box;
 }
-// .btn-submit {
-//   background: green;
-//   color: #fff;
-//   border-color: green;
-//   &:hover {
-//     background: green;
-//     color: #fff;
-//   }
-//   &:focus {
-//     background: green;
-//     color: #fff;
-//   }
-// }
 </style>

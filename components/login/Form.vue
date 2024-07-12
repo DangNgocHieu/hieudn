@@ -84,8 +84,7 @@ export default {
     form: {
       handler() {
         this.$refs.ruleForm?.validate((valid) => {
-          console.log(valid, "bbbb");
-          this.isDisableSubmit = !valid;
+          this.$store.commit("login/SET_IS_DISABLE_SUBMIT", !valid);
         });
       },
       deep: true,
@@ -112,16 +111,22 @@ export default {
               data: {
                 email: this.email,
                 password: this.password,
-                loginTwoFa: true,
+                // loginTwoFa: true,
               },
             });
             if (res) {
               this.$store.commit("SET_LOADING", false);
-              this.$router.push("/dashboard");
+              this.openNotificationWithIcon("success", "Đăng nhập thành công");
+            } else {
             }
           } catch (error) {
+            if (error?.response?.status === 422) {
+              this.openNotificationWithIcon(
+                "error",
+                "Vui lòng kiểm tra lại tài khoản và mật khẩu",
+              );
+            }
             this.$store.commit("SET_LOADING", false);
-            console.log(error);
           }
         } else {
           this.$store.commit("login/SET_IS_DISABLE_SUBMIT", true);
@@ -239,17 +244,4 @@ input {
   flex-direction: column;
   align-items: center;
 }
-// .btn-submit {
-//   background: green;
-//   color: #fff;
-//   border-color: green;
-//   &:hover {
-//     background: green;
-//     color: #fff;
-//   }
-//   &:focus {
-//     background: green;
-//     color: #fff;
-//   }
-// }
 </style>

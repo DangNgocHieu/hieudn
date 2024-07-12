@@ -4,7 +4,7 @@ const INIT_STATE = {
   form: {
     email: "",
     password: "",
-    checkPass: ""
+    confirmPass: ""
   },
   isDisableSubmit: false
 };

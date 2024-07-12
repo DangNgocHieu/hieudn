@@ -3,7 +3,7 @@
     <div class="main">
       <div class="tab-menu">
         <div class="icon">
-          <a href="">
+          <a>
             <img width="65" height="45" src="../assets/images/logo_1.png" />
           </a>
         </div>
@@ -69,10 +69,10 @@
           </span>
           <div class="menu-dropdown" :class="{ displayMenu: !isShowMenu }">
             <ul>
-              <li><a href="">Thông tin cá nhân</a></li>
-              <li><a href="">Cài đặt</a></li>
+              <li><a>Thông tin cá nhân</a></li>
+              <li><a>Cài đặt</a></li>
 
-              <li><a href="">Đăng xuất</a></li>
+              <li><a @click="handleLogout">Đăng xuất</a></li>
             </ul>
           </div>
         </div>
@@ -182,6 +182,11 @@ export default {
       this.isFocus = this.dataMenu.find(
         (item) => item.router === this.$route.name,
       )?.value;
+    },
+    async handleLogout() {
+      this.$store.commit("SET_LOADING", true);
+      await this.$auth.logout();
+      this.$store.commit("SET_LOADING", false);
     },
   },
 };

@@ -21,6 +21,8 @@ export default {
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
     "~/plugins/ant-design-vue.js",
+    "~/plugins/csrf.js",
+
     // "~/plugins/axios.js",
     // "~/plugins/vuelidate.js",
 
@@ -92,16 +94,16 @@ export default {
   },
   proxy: {
     "/laravel": {
-      target: "https://2573-118-70-146-171.ngrok-free.app/api/",
+      target: "http://10.101.11.6/api/",
       pathRewrite: { "^/laravel": "/" },
     },
   },
 
   auth: {
     redirect: {
-      login: "/login/",
+      login: "/login",
       logout: "/login/",
-      home: "/",
+      home: "/dashboard",
     },
     strategies: {
       laravelSanctum: {
@@ -115,6 +117,10 @@ export default {
           },
           login: {
             url: `/auth/login/`,
+            method: "post",
+          },
+          logout: {
+            url: `/auth/logout/`,
             method: "post",
           },
           user: {

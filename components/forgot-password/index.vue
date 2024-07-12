@@ -92,7 +92,7 @@ export default {
     },
     async handleForgotPassword(e) {
       e.preventDefault();
-      await this.$axios.get("/laravel/csrf-cookie");
+      // await this.$axios.get("/laravel/csrf-cookie");
       const res = await this.$axios.post("/laravel/auth/forgot-password", {
         email: this.email,
       });
