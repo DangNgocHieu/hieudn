@@ -85,27 +85,59 @@
       cancelText="Hủy"
       @cancel="handleCancel"
     >
-      <a-form :form="form" @submit="handleSubmit">
-        <a-form-item label="Số tiền">
-          <a-input
-            name="moneyAmount"
-            v-decorator="[
-              'Số tiền',
-              {
-                rules: [
-                  { required: true, message: 'Vui lòng nhập số tiền nạp' },
-                  {
-                    pattern: /^\d+$/,
-                    message: 'Vui lòng nhập số',
-                    trigger: ['blur', 'change'],
-                  },
-                ],
-              },
-            ]"
-            :value="moneyAmount"
-          />
-        </a-form-item>
-      </a-form>
+    <div v-if="step=== 1">
+      <a-form-model
+        ref="ruleForm"
+        :model="formMoney"
+        @submit="handleSubmit"
+        :rules="rules"
+      >
+        <a-form-model-item label="Số tiền">
+          <a-input name="moneyAmount" v-model="moneyAmount" />
+        </a-form-model-item>
+      </a-form-model>
+    </div>
+     <div v-else>
+      <div className="info-bank">
+        <img src={Tpbank} alt="tpbank" width={150} height={150} />
+        <div className="info-bank__info">
+          <div className="info-bank__block">
+            <div>CHỦ TÀI KHOẢN:</div>
+            <div>
+              <b>{{dataInfoBank.beneficiary_name}}</b>
+            </div>
+          </div>
+          <div className="info-bank__block">
+            <div>SỐ TÀI KHOẢN:</div>
+            <div>
+              <b>{{dataInfoBank.account_number}}</b>
+            </div>
+          </div>
+          <div className="info-bank__block">
+            <div>NỘI DUNG CHUYỂN KHOẢN:</div>
+            <div>
+              <b>{{dataInfoBank.reference_number}}</b>
+            </div>
+          </div>
+          <div className="info-bank__block">
+            <div>SỐ TIỀN CHUYỂN:</div>
+            <div>
+              <b>{{dataInfoBank.transfer_amount}}đ</b>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="info-bank"><b className='info-bank__title'>Quét mã thanh toán QR</b></div>
+      <div className="info-bank">
+        <img :src="dataInfoBank.qr" className="info-bank__qr" width={150} height={150} alt="qr-payment" />
+      </div>
+     </div>
+     <template slot="footer" v-if="step==2">
+        <a-button key="back" @click="handleCancel">
+          Đóng
+        </a-button>
+        
+      </template>
     </a-modal>
   </div>
 </template>
@@ -120,16 +152,14 @@ export default {
   components: {},
   computed: {
     ...mapFields({
+      dataInfoBank:"customize.dataInfoBank",
       dataCustomize: "customize.dataCustomize",
       dataDetail: "customize.dataDetail",
       isOpenModal: "customize.isOpenModal",
-      moneyAmount: "customize.moneyAmount",
+      formMoney: "customize.formMoney",
+      moneyAmount: "customize.formMoney.moneyAmount",
+      step:"customize.step"
     }),
-    dataChart() {
-      return this.dataDetail?.allocation.map((el) => {
-        return el.percentage;
-      });
-    },
   },
   data() {
     return {
@@ -172,6 +202,18 @@ export default {
           key: "abc",
         },
       ],
+      dataChart: [],
+      labelsChart: [],
+      rules: {
+        moneyAmount: [
+          { required: true, message: "Vui lòng nhập số tiền nạp" },
+          {
+            pattern: /^\d+$/,
+            message: "Vui lòng nhập số",
+            trigger: ["blur", "change"],
+          },
+        ],
+      },
     };
   },
 
@@ -185,6 +227,11 @@ export default {
       console.log(res, "res");
       this.$store.commit("SET_LOADING", false);
       this.$store.commit("customize/SET_DATA_DETAIL", res?.data?.data);
+      res?.data?.data?.allocation?.forEach((el) => {
+        this.dataChart.push(el.percentage);
+        this.labelsChart.push(el.code);
+      });
+      this.myChart.update();
     }
   },
   methods: {
@@ -193,7 +240,7 @@ export default {
       this.myChart = new Chart(ctx, {
         type: "doughnut",
         data: {
-          labels: ["Red", "Blue", "Yellow"],
+          labels: this.labelsChart,
           datasets: [
             {
               data: this.dataChart,
@@ -222,17 +269,29 @@ export default {
     handleOk() {
       console.log("11");
     },
-    handleSubmit(e) {
-      e.preventDefault();
-
-      this.form.validateFields((err, values) => {
-        console.log(err);
-        if (!err) {
-          console.log("Received values of form: ", values);
+    async handleSubmit(e) {
+      try {
+        this.$store.commit("SET_LOADING", true);
+        const res = await this.$axios.post(
+          `laravel/packages/${this.$route.params.id}/invest`,
+          {
+            amount: this.moneyAmount,
+          },
+        );
+        console.log(res.data.data);
+        if (res.data.data) {
+          this.step = 2 
+          this.dataInfoBank = res.data.data
+          this.$store.commit("SET_LOADING", false);
+        } else {
+          this.$store.commit("SET_LOADING", false);
         }
-      });
+      } catch (error) {
+        this.$store.commit("SET_LOADING", false);
+      }
     },
     handleCancel() {
+      this.isOpenModal = false
       this.form.resetFields();
     },
     onFinish() {},

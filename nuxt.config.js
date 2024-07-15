@@ -94,7 +94,7 @@ export default {
   },
   proxy: {
     "/laravel": {
-      target: "http://10.101.11.6/api/",
+      target: "https://sturdy-broccoli-r6g447vr9w5c5vpv-80.app.github.dev/api/",
       pathRewrite: { "^/laravel": "/" },
     },
   },
@@ -102,7 +102,8 @@ export default {
   auth: {
     redirect: {
       login: "/login",
-      logout: "/login/",
+      logout: "/login/",      
+      
       home: "/dashboard",
     },
     strategies: {

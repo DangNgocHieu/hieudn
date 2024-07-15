@@ -40,7 +40,7 @@
           <a-button
             @click="handleChoose(el.id)"
             v-if="!el.isChoose"
-            :disabled="getDisable === 100"
+            :disabled="isDisable >= 100"
             >Chọn</a-button
           >
           <div v-else class="btn-input">
@@ -49,13 +49,16 @@
               :max="100"
               :min="0"
               v-model="el.value"
+              @change="handleChangeInvestment(el)"
             ></a-input-number>
-            <a-button @click="handleCancelChoose(el.id)">Hủy</a-button>
+            <a-button @click="handleCancelChoose(el)">Hủy</a-button>
           </div>
         </template>
       </a-card>
       <div class="footer">
-        <a-button @click="handleCreatePackage">Tạo</a-button>
+        <a-button @click="handleCreatePackage" :disabled="isDisable !== 100"
+          >Tạo</a-button
+        >
       </div>
     </a-card>
   </div>
@@ -67,52 +70,22 @@ Chart.register(...registerables);
 export default {
   data() {
     return {
-      dataFunds: [
-        {
-          code: "TCBF",
-          id: 1,
-          isChoose: false,
-          type: "TCBF",
-          value: 0,
-        },
-        {
-          code: "TCFF",
-          id: 2,
-          isChoose: false,
-          type: "TCFF",
-          value: 0,
-        },
-        {
-          code: "TCEF",
-          id: 3,
-          isChoose: false,
-          type: "TCEF",
-          value: 0,
-        },
-        {
-          code: "TCFIN",
-          id: 4,
-          isChoose: false,
-          type: "TCFIN",
-          value: 0,
-        },
-      ],
+      dataFundsInit: [],
+      dataFunds: [],
       myChartCreate: null,
       name: "",
+      dataChart: [0, 0, 0, 0],
+      labelChart: ["TCBF", "TCFF", "TCEF", "TCFIN"],
     };
   },
-  watch: {
-    data(newValue, oldValue) {
-      this.myChartCreate.destroy();
-      this.createChart();
-    },
-  },
+  watch: {},
+
   mounted() {
     this.createChart();
-    // this.initData();
+    this.initData();
   },
   computed: {
-    getDisable() {
+    isDisable() {
       let sum = 0;
       this.dataFunds.map((el) => {
         sum = sum + el.value;
@@ -131,6 +104,7 @@ export default {
             return { ...el, isChoose: false, value: 0, type: el.code };
           });
           this.dataFunds = data;
+          this.dataFundsInit = data;
           this.$store.commit("SET_LOADING", false);
         } else {
           this.$store.commit("SET_LOADING", false);
@@ -144,14 +118,15 @@ export default {
       this.myChartCreate = new Chart(ctx, {
         type: "doughnut",
         data: {
-          labels: ["Red", "Blue", "Yellow"],
+          labels: this.labelChart,
           datasets: [
             {
-              data: [10, 10, 10],
+              data: this.dataChart,
               backgroundColor: [
                 "rgb(255, 99, 132)",
                 "rgb(54, 162, 235)",
                 "rgb(255, 205, 86)",
+                "rgb(255, 205, 0)",
               ],
               hoverOffset: 4,
             },
@@ -172,10 +147,13 @@ export default {
         el.id === id ? { ...el, isChoose: true } : el,
       );
     },
-    handleCancelChoose(id) {
+    handleCancelChoose(value) {
+      console.log(value, "value");
       this.dataFunds = this.dataFunds.map((el) =>
-        el.id === id ? { ...el, isChoose: false, value: 0 } : el,
+        el.id == value.id ? { ...el, isChoose: false, value: 0 } : el,
       );
+      this.dataChart[value.id - 1] = 0;
+      this.myChartCreate.update();
     },
     async handleCreatePackage() {
       try {
@@ -192,13 +170,17 @@ export default {
           name: this.name,
           allocation: [...listAllocation],
         };
-        const { res } = await this.$axios.post(
+        const { data } = await this.$axios.post(
           "/laravel/packages/create",
           dataApi,
         );
-        console.log(res);
-        if (res) {
+        if (data.data) {
           this.$store.commit("SET_LOADING", false);
+          this.dataFunds = this.dataFundsInit;
+          this.name = "";
+          Object.assign(this.dataChart, [0,0,0,0])
+           
+          this.myChartCreate.update();
         } else {
           this.$store.commit("SET_LOADING", false);
         }
@@ -206,6 +188,10 @@ export default {
         console.log(error);
         this.$store.commit("SET_LOADING", false);
       }
+    },
+    handleChangeInvestment(value) {
+      this.dataChart[value.id - 1] = value.value;
+      this.myChartCreate.update();
     },
   },
 };
