@@ -1,7 +1,7 @@
 import { getField, updateField } from "vuex-map-fields";
 import { cloneDeep } from "lodash";
 const INIT_STATE = {
-    dataInfoBank:[],
+  dataInfoBank: [],
   dataCustomize: [],
   dataDetail: [],
   isOpenModal: false,
@@ -9,6 +9,9 @@ const INIT_STATE = {
     moneyAmount: null,
   },
   step: 1,
+  typeModal: 0,
+  bank_id: "",
+  account_id: ""
 };
 
 export const state = () => cloneDeep(INIT_STATE);
@@ -46,6 +49,15 @@ export const mutations = {
   },
   SET_MONEY_AMOUNT(state, payload) {
     state.formState.moneyAmount = payload;
+  },
+  SET_TYPE_MODAL(state, payload) {
+    state.typeModal = payload;
+  },
+  SET_BANK_ID(state, payload) {
+    state.bank_id = payload;
+  },
+  SET_ACCOUNT_ID(state, payload) {
+    state.account_id = payload;
   },
 };
 export const getters = {

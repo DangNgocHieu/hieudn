@@ -102,9 +102,8 @@ export default {
   auth: {
     redirect: {
       login: "/login",
-      logout: "/login/",      
-      
-      home: "/dashboard",
+      logout: "/login/",
+      home: "/",
     },
     strategies: {
       laravelSanctum: {

@@ -5,8 +5,11 @@
 <script>
 export default {
   middleware({ $auth, redirect }) {
-    // redirect("/ekyc");
+    if (!$auth.user.data.is_verify) {
+      // redirect("/ekyc");
+    }
   },
+  created() {},
 };
 </script>
 
