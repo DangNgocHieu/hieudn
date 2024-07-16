@@ -179,7 +179,6 @@ export default {
     },
     //hoan tat
     async handleConfirm() {
-      console.log("111");
       try {
         this.$store.commit("SET_LOADING", true);
         const res = await this.$axios.post("/laravel/me/kyc/verify");
@@ -193,10 +192,13 @@ export default {
           this.$router.push("/dashboard");
         } else {
           this.$store.commit("SET_LOADING", false);
-          this.openNotificationWithIcon("success", "Bạn đã xác thực thất bại");
         }
       } catch (error) {
-        console.log(error);
+        this.$store.commit("SET_LOADING", false);
+        this.openNotificationWithIcon(
+          "error",
+          "Bạn đã xác thực thất bại, Ảnh không hợp lệ",
+        );
         this.$store.commit("SET_LOADING", false);
       }
     },
