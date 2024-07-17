@@ -370,9 +370,10 @@ export default {
           }
         } catch (error) {
           this.openNotificationWithIcon(
-            "error",
+            "errors",
             error?.response?.data?.message,
           );
+
           this.$store.commit("SET_LOADING", false);
         }
       }

@@ -62,6 +62,53 @@
         </div>
       </div>
     </div>
+    <div class="package-inves-title">Các gói đầu tư</div>
+    <a-card
+      :title="item?.package?.name"
+      v-for="(item, key) in assetInvest?.packages"
+      :key="key"
+    >
+      <template #extra
+        ><a href="#"
+          ><img
+            :src="
+              item.avatar
+                ? item.avatar
+                : require('~/assets/images/custom_package.svg')
+            "
+            class="recharge__title"
+            alt="title_recharge"
+            width="50px"
+            height="50px" /></a
+      ></template>
+      <div class="invest-package">
+        <div class="invest-package-child">
+          Đã đầu tư:
+          <p class="text-growth">
+            {{
+              String(item.investment_amount).replace(
+                /\B(?=(\d{3})+(?!\d))/g,
+                ",",
+              )
+            }}
+            &nbsp;đ
+          </p>
+        </div>
+        <div>{{ formatDateTime(item.created_at) }}</div>
+      </div>
+      <div class="growth-package">
+        Tăng trưởng:
+        <p class="text-growth">
+          {{ formatCurrency(item.profit) }} &nbsp;đ&nbsp;&nbsp;({{
+            computedInvest(item.profit, item.investment_amount)
+          }}%)
+        </p>
+      </div>
+
+      <p class="recharge-detail" @click="handleCustomize(item.id)">
+        Xem chi tiết >
+      </p>
+    </a-card>
   </div>
 </template>
 
@@ -98,6 +145,9 @@ export default {
         console.log(error);
         this.$store.commit("SET_LOADING", false);
       }
+    },
+    handleCustomize(id) {
+      this.$router.push(`/invest/recharge/customize/${id}`);
     },
   },
 };
@@ -155,5 +205,33 @@ export default {
 .text-medium {
   padding-top: 4px;
   font-weight: 600;
+}
+.recharge-detail {
+  font-weight: 600;
+  color: #32c610;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.invest-package {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  .invest-package-child {
+    display: flex;
+    flex-direction: row;
+  }
+}
+.growth-package {
+  display: flex;
+  flex-direction: row;
+}
+.text-growth {
+  font-weight: 600;
+  padding-bottom: 10px;
+  padding-left: 10px;
+}
+.package-inves-title {
+  padding: 30px 0;
+  font-size: 20px;
 }
 </style>

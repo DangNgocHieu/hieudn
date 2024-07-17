@@ -126,6 +126,9 @@ export default {
                 "Vui lòng kiểm tra lại tài khoản và mật khẩu",
               );
             }
+            if (error?.response?.status === 419) {
+              this.openNotificationWithIcon("error", "CSRF token mismatch.");
+            }
             this.$store.commit("SET_LOADING", false);
           }
         } else {

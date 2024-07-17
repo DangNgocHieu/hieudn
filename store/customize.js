@@ -11,7 +11,7 @@ const INIT_STATE = {
   step: 1,
   typeModal: 0,
   bank_id: "",
-  account_id: ""
+  account_id: "",
 };
 
 export const state = () => cloneDeep(INIT_STATE);

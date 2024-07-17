@@ -1,4 +1,5 @@
 
+import dayjs from 'dayjs';
 
 export default {
   data() {
@@ -27,7 +28,14 @@ export default {
     formatCurrency(value) {
       if (!value) return 0;
       return String(value.toFixed(2)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    },
+    formatDateTime(value) {
+      if (!value) return '';
+      return dayjs(value).format('DD-MM-YYYY');
+    },
+    computedInvest(profit, total) {
+      if (!total) return 0;
+      return ((profit / total) * 100).toFixed(2);
     }
-
   },
 };

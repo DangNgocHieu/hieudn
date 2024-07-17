@@ -1,5 +1,5 @@
 <template>
-  <Calculator />
+  <InvestRechargeDefaultDetail />
 </template>
 
 <script>
