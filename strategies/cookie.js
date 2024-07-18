@@ -2,23 +2,33 @@ import { CookieScheme } from "~auth/runtime";
 
 export default class CustomScheme extends CookieScheme {
     async login(endpoint) {
-        this.$auth.reset({ resetInterceptor: false });
-        const { loginTwoFa, ...data } = endpoint.data;
+        try {
+            console.log(endpoint.data, "endpoint");
+            this.$auth.reset({ resetInterceptor: false });
+            const { loginTwoFa, ...data } = endpoint.data;
 
-        const url = loginTwoFa ? this.options.endpoints.loginTwoFa : this.options.endpoints.login
+            const url = loginTwoFa ? this.options.endpoints.loginTwoFa : this.options.endpoints.login
 
-        const response = await this.$auth.request({ ...endpoint, data }, url);
+            const response = await this.$auth.request({ ...endpoint, data }, url);
 
-        this.updateTokens(response);
+            console.log(response, "response");
+            this.updateTokens(response);
+            console.log(this.updateTokens(response));
+            // if (!this.requestHandler.interceptor) {
+            //     this.initializeRequestInterceptor();
+            // }
 
-        if (!this.requestHandler.interceptor) {
-            this.initializeRequestInterceptor();
+            // if (this.options.user.autoFetch) {
+            //     await this.fetchUser();
+            // }
+
+            return response;
+        } catch (error) {
+            console.log(error, "eerrrrr");
         }
-
-        if (this.options.user.autoFetch) {
-            await this.fetchUser();
-        }
-
-        return response;
+    }
+    updateTokens(response) {
+        const token = response?.data?.accessToken;
+        this.token.set(token);
     }
 }

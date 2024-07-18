@@ -132,10 +132,13 @@ export default {
             method: "post",
           },
         },
+        user: {
+          autoFetch: false
+        }
       },
     },
   },
   router: {
-    // middleware: ["auth"],
+    middleware: ["auth"],
   },
 };

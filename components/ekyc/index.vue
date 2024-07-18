@@ -184,11 +184,11 @@ export default {
         const res = await this.$axios.post("/laravel/me/kyc/verify");
         if (res) {
           this.$store.commit("SET_LOADING", false);
-
           this.openNotificationWithIcon(
             "success",
             "Bạn đã xác thực thành công",
           );
+          await this.$auth.fetchUser();
           this.$router.push("/dashboard");
         } else {
           this.$store.commit("SET_LOADING", false);

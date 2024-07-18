@@ -6,7 +6,7 @@
 export default {
   middleware({ $auth, redirect }) {
     if (!$auth.user.data.is_verify) {
-      // redirect("/ekyc");
+      redirect("/ekyc");
     }
   },
   created() {},
