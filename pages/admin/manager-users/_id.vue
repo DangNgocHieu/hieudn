@@ -4,7 +4,7 @@
       <a-breadcrumb-item>
         <nuxt-link to="/admin/manager-users">Quản lý người dùng</nuxt-link>
       </a-breadcrumb-item>
-      <a-breadcrumb-item>User 1</a-breadcrumb-item>
+      <a-breadcrumb-item>{{ details?.name }}</a-breadcrumb-item>
     </a-breadcrumb>
     <div class="mt-4">
       <a-tabs
@@ -29,14 +29,22 @@
 </template>
 
 <script>
+import { mapActions, mapState } from "vuex";
+import detail from "./../../../components/invest/recharge/customize/detail.vue";
 export default {
+  components: { detail },
   layout: "admin",
+  computed: {
+    ...mapState("admin", ["details"]),
+  },
   mounted() {
+    this.getDetails({ id: this.$route.params.id });
     if (!this.$route.query?.tab) {
       this.$router.push({ query: { ...this.$route.query, tab: 1 } });
     }
   },
   methods: {
+    ...mapActions("admin", ["getDetails"]),
     handleChangeTab(key) {
       this.$router.push({ query: { ...this.$route.query, tab: key } });
     },

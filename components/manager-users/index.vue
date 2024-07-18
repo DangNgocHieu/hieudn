@@ -17,6 +17,11 @@
         {{ (pagination?.current_page - 1) * pagination?.per_page + index + 1 }}
       </template>
       <a slot="name" slot-scope="text">{{ text }}</a>
+      <a slot="role" slot-scope="role"
+        ><a-tag :color="getRole(role).color">
+          {{ getRole(role).text }}
+        </a-tag>
+      </a>
       <a slot="status" slot-scope="data"
         ><a-tag :color="getStatus(data?.is_activated).color">
           {{ getStatus(data?.is_activated).text }}
@@ -75,6 +80,7 @@ const columns = [
     dataIndex: "role",
     key: "role",
     width: 160,
+    scopedSlots: { customRender: "role" },
   },
   {
     title: "Trạng thái tài khoản",
@@ -146,6 +152,12 @@ export default {
       return {
         color: !status ? "orange" : "green",
         text: !status ? "Đang chờ" : "Đã xác nhận",
+      };
+    },
+    getRole(role) {
+      return {
+        color: role === 0 ? "orange" : "green",
+        text: role === 0 ? "User" : "Admin",
       };
     },
     handleChange(value) {
