@@ -8,17 +8,23 @@
       :columns="columns"
       :data-source="data"
       :row-selection="rowSelection"
+      :pagination="pagination"
+      :loading="loading"
+      @change="handleTableChange"
       :style="'background-color:#fff'"
     >
+      <template slot="key" slot-scope="record, text, index">
+        {{ (pagination?.current_page - 1) * pagination?.per_page + index + 1 }}
+      </template>
       <a slot="name" slot-scope="text">{{ text }}</a>
-      <a slot="status" slot-scope="status"
-        ><a-tag :color="getStatus(status).color">
-          {{ getStatus(status).text }}
+      <a slot="status" slot-scope="data"
+        ><a-tag :color="getStatus(data?.is_activated).color">
+          {{ getStatus(data?.is_activated).text }}
         </a-tag>
       </a>
-      <a slot="ekyc_status" slot-scope="ekyc_status"
-        ><a-tag :color="getStatus(ekyc_status).color">
-          {{ getStatus(ekyc_status).text }}
+      <a slot="ekyc_status" slot-scope="is_verify"
+        ><a-tag :color="getStatusKyc(is_verify).color">
+          {{ getStatusKyc(is_verify).text }}
         </a-tag>
       </a>
       <a slot="actions" slot-scope="data">
@@ -50,9 +56,9 @@
 const columns = [
   {
     title: "STT",
-    dataIndex: "key",
     key: "key",
     width: 80,
+    scopedSlots: { customRender: "key" },
   },
   {
     title: "Email",
@@ -72,14 +78,13 @@ const columns = [
   },
   {
     title: "Trạng thái tài khoản",
-    dataIndex: "status",
     key: "status",
     scopedSlots: { customRender: "status" },
     width: 160,
   },
   {
     title: "Xác minh eKYC",
-    dataIndex: "ekyc_status",
+    dataIndex: "is_verify",
     key: "ekyc_status",
     scopedSlots: { customRender: "ekyc_status" },
     width: 160,
@@ -98,38 +103,7 @@ const columns = [
   },
 ];
 
-const data = [
-  {
-    id: 1,
-    key: "1",
-    name: "Đặng Ngọc Hiếu",
-    created_date: "04/07/2024",
-    role: "Admin",
-    ekyc_status: 1,
-    email: "hieudn@rikkeisoft.com",
-    status: 1,
-  },
-  {
-    id: 2,
-    key: "2",
-    name: "Đặng Ngọc Hiếu",
-    created_date: "04/07/2024",
-    role: "Admin",
-    ekyc_status: 1,
-    email: "hieudn@rikkeisoft.com",
-    status: 2,
-  },
-  {
-    id: 3,
-    key: "3",
-    name: "Đặng Ngọc Hiếu",
-    created_date: "04/07/2024",
-    role: "Admin",
-    ekyc_status: 2,
-    email: "hieudn@rikkeisoft.com",
-    status: 1,
-  },
-];
+const data = [];
 
 const rowSelection = {
   onChange: (selectedRowKeys, selectedRows) => {
@@ -154,13 +128,24 @@ export default {
       columns,
       filter: "",
       rowSelection,
+      loading: false,
+      pagination: {},
     };
+  },
+  mounted() {
+    this.getListUsers();
   },
   methods: {
     getStatus(status) {
       return {
-        color: status === 1 ? "orange" : "green",
-        text: status === 1 ? "Đang chờ" : "Đã xác nhận",
+        color: !status ? "orange" : "green",
+        text: !status ? "Đang chờ" : "Đã xác nhận",
+      };
+    },
+    getStatusKyc(status) {
+      return {
+        color: !status ? "orange" : "green",
+        text: !status ? "Đang chờ" : "Đã xác nhận",
       };
     },
     handleChange(value) {
@@ -169,6 +154,22 @@ export default {
     confirmDelete(e) {
       console.log(e);
       this.$message.success("Click on Yes");
+    },
+    async getListUsers() {
+      this.loading = true;
+      try {
+        const response = await this.$axios.get("laravel/admin/users");
+        if (response) {
+          this.data = response?.data?.data?.data;
+          const { current_page, from, last_page, per_page, total } =
+            response?.data?.data;
+          this.pagination = { current_page, from, last_page, per_page, total };
+        }
+      } catch (error) {
+        this.$message.error(error?.response?.data?.message);
+      } finally {
+        this.loading = false;
+      }
     },
   },
 };
