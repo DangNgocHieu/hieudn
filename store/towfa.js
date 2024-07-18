@@ -2,7 +2,7 @@ import { getField, updateField } from "vuex-map-fields";
 import { cloneDeep } from "lodash";
 const INIT_STATE = {
     form: {
-        dataTowFa: ""
+        data2Fa: ""
     },
     isDisableOTP: false
 };
@@ -23,7 +23,7 @@ export const actions = {
 export const mutations = {
     updateField,
     SET_DATA_TWO_FA(state, payload) {
-        state.form.dataTowFa = payload;
+        state.form.data2Fa = payload;
     },
 
     RESET_STATE(state, payload = []) {

@@ -7,22 +7,15 @@
         :show-upload-list="false"
         :before-upload="beforeUpload"
         @change="handleUpdateAvatar"
-        :disabled="!isChange"
       >
-        <!-- <div>
-          <div v-if="imageUrl" class="image-parent">
-            <img :src="imageUrl" alt="" width="102" height="102" />
-            <div class="image-child">
-              <a-icon type="eye" class="icon-eye" @click="handlePreview" />
-              <a-icon class="icon-delete" type="delete" />
-            </div>
-          </div>
-          <div v-else>
-            <a-icon :type="loading ? 'loading' : 'plus'" />
-            <div class="ant-upload-text">Upload</div>
-          </div>
-        </div> -->
-        <img :src="imageUrl" alt="" width="102" height="102" v-if="imageUrl" />
+        <img
+          :src="`${imageUrl.replace('/api', '/laravel')}`"
+          alt=""
+          width="102"
+          height="102"
+          v-if="imageUrl"
+        />
+
         <div v-else>
           <a-icon :type="loading ? 'loading' : 'plus'" />
           <div class="ant-upload-text">Upload</div>
@@ -33,7 +26,9 @@
       </a-modal>
     </a-card>
     <a-card title="Trạng thái tài khoản">
-      <span>Đã kích hoạt</span>
+      <a-tag :color="`${$auth?.user?.data?.is_verify ? '#87d068' : '#f50'}`">
+        {{ $auth?.user?.data?.is_verify ? "Đã kích hoạt" : "Chưa kích hoạt" }}
+      </a-tag>
     </a-card>
     <a-card title="Thông tin cá nhân">
       <a-form-model ref="formInfo" :model="formInfo" :rules="rulesInfo">
@@ -239,7 +234,6 @@ export default {
       },
       loading: false,
       previewVisible: false,
-      previewImage: "",
     };
   },
   computed: {
@@ -248,7 +242,12 @@ export default {
       imageUrl: "profile.imageUrl",
     }),
   },
-  mounted() {},
+  mounted() {
+    this.$store.commit(
+      "profile/SET_IMG_URL",
+      this.$auth.user.data.avatar ? this.$auth.user.data.avatar : "",
+    );
+  },
   methods: {
     handleCancel() {
       this.previewVisible = false;
@@ -282,20 +281,41 @@ export default {
         });
       }
     },
-    beforeUpload(file) {
-      const isJpgOrPng = file.type === "image/jpg" || file.type === "image/png";
+    async beforeUpload(file) {
+      console.log(file.type, "file.type");
+      const isJpgOrPng = ["image/jpg", "image/png", "image/jpeg"].includes(
+        file.type,
+      );
+      const isLt2M = file.size / 1024 / 1024 < 2;
       if (!isJpgOrPng) {
         this.openNotificationWithIcon(
           "error",
           "Bạn chỉ có thể tải lên ảnh có dạng .jpg hoặc .png",
         );
-      }
-      const isLt2M = file.size / 1024 / 1024 < 2;
-      if (!isLt2M) {
+      } else if (!isLt2M) {
         this.openNotificationWithIcon(
           "error",
           "Bạn chỉ có thể tải lên ảnh có dung lượng < 2MB!",
         );
+      } else {
+        try {
+          this.$store.commit("SET_LOADING", true);
+          let formData = new FormData();
+          formData.append("image", file);
+          const { data } = await this.$axios.post(
+            "/laravel/me/change-avatar",
+            formData,
+          );
+
+          if (data) {
+            this.$store.commit("SET_LOADING", false);
+            await this.$auth.fetchUser();
+          } else {
+            this.$store.commit("SET_LOADING", false);
+          }
+        } catch (error) {
+          this.$store.commit("SET_LOADING", false);
+        }
       }
       return isJpgOrPng && isLt2M;
     },

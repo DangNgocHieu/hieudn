@@ -13,7 +13,8 @@
       />
       <a-button
         :style="'margin-top:20px'"
-        :disabled="this.dataTowFa?.length < 6"
+        :disabled="this.data2Fa?.length < 6"
+        @click="handleSubmit()"
         >Xác nhận</a-button
       >
     </a-card>
@@ -24,15 +25,17 @@
 import OtpInput from "@bachdgvn/vue-otp-input";
 
 import { mapFields } from "vuex-map-fields";
+import generate from "../../mixins/generate";
 
 export default {
   components: {
     OtpInput,
   },
+  mixins: [generate],
   computed: {
     ...mapFields({
       form: "towfa.form",
-      dataTowFa: "towfa.form.dataTowFa",
+      data2Fa: "towfa.form.data2Fa",
       isDisableOTP: "towfa.isDisableOTP",
     }),
   },
@@ -51,10 +54,29 @@ export default {
   },
   methods: {
     handleOnComplete(value) {
-      this.dataTowFa = value;
+      this.data2Fa = value;
     },
     handleOnChange(value) {
-      this.dataTowFa = value;
+      this.data2Fa = value;
+    },
+    async handleSubmit() {
+      try {
+        this.$store.commit("SET_LOADING", true);
+        const res = await this.$axios.post(
+          "/laravel/auth/two-factor-challenge",
+          { code: this.data2Fa },
+        );
+        if (res.status < 400) {
+          this.$auth.fetchUser();
+          this.$store.commit("SET_LOADING", false);
+          this.openNotificationWithIcon("success", "Đăng nhập thành công");
+        } else {
+          this.$store.commit("SET_LOADING", false);
+          this.openNotificationWithIcon("error", "Xác thực thất bại");
+        }
+      } catch (error) {
+        this.$store.commit("SET_LOADING", false);
+      }
     },
   },
 };

@@ -106,20 +106,40 @@ export default {
       this.$store.commit("SET_LOADING", true);
       this.$refs.ruleForm.validate(async (valid) => {
         if (valid) {
+          console.log(valid);
           try {
             const res = await this.$auth.loginWith("laravelSanctum", {
               data: {
                 email: this.email,
+
                 password: this.password,
-                // loginTwoFa: true,
               },
             });
-            if (res) {
+            console.log(res, "res");
+            if (res.data.data.two_factor) {
+              this.$router.push("/2fa");
               this.$store.commit("SET_LOADING", false);
-              this.openNotificationWithIcon("success", "Đăng nhập thành công");
             } else {
+              const { data } = await this.$auth.fetchUser();
+              console.log(data, "dataaaaaaa");
+              if (data) {
+                this.$store.commit("SET_LOADING", false);
+                this.openNotificationWithIcon(
+                  "success",
+                  "Đăng nhập thành công",
+                );
+              } else {
+                this.$store.commit("SET_LOADING", false);
+              }
             }
           } catch (error) {
+            console.log(error, "asdasdasdasds");
+            if (error?.response?.status === 403) {
+              this.openNotificationWithIcon(
+                "error",
+                "Địa chỉ email của bạn chưa được xác minh",
+              );
+            }
             if (error?.response?.status === 422) {
               this.openNotificationWithIcon(
                 "error",
