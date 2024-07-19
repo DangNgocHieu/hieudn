@@ -94,7 +94,8 @@ export default {
   },
   proxy: {
     "/laravel": {
-      target: "https://sturdy-broccoli-r6g447vr9w5c5vpv-80.app.github.dev/api/",
+      target:
+        "https://vigilant-space-yodel-65g99v7rj4xc4799-80.app.github.dev/api/",
       pathRewrite: { "^/laravel": "/" },
     },
   },
@@ -133,8 +134,8 @@ export default {
           },
         },
         user: {
-          autoFetch: false
-        }
+          autoFetch: false,
+        },
       },
     },
   },

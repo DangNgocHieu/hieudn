@@ -2,7 +2,11 @@
   <div>
     <div class="header-history">
       <h1>Quản lý người dùng</h1>
-      <ManagerUsersFilters />
+      <ManagerUsersFilters
+        :filter="filter"
+        @search="handleSearch"
+        @add="handleAddUser"
+      />
     </div>
     <a-table
       :columns="columns"
@@ -167,10 +171,12 @@ export default {
       console.log(e);
       this.$message.success("Click on Yes");
     },
-    async getListUsers() {
+    async getListUsers(payload) {
       this.loading = true;
       try {
-        const response = await this.$axios.get("laravel/admin/users");
+        const response = await this.$axios.get("laravel/admin/users", {
+          params: { ...payload },
+        });
         if (response) {
           this.data = response?.data?.data?.data;
           const { current_page, from, last_page, per_page, total } =
@@ -182,6 +188,12 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    handleSearch() {
+      this.getListUsers({ ...this.filter });
+    },
+    handleAddUser() {
+      console.log(123);
     },
   },
 };
