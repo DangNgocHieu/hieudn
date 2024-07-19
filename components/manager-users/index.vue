@@ -123,12 +123,8 @@ const rowSelection = {
       selectedRows,
     );
   },
-  onSelect: (record, selected, selectedRows) => {
-    console.log(record, selected, selectedRows);
-  },
-  onSelectAll: (selected, selectedRows, changeRows) => {
-    console.log(selected, selectedRows, changeRows);
-  },
+  onSelect: (record, selected, selectedRows) => {},
+  onSelectAll: (selected, selectedRows, changeRows) => {},
 };
 
 export default {
@@ -168,7 +164,6 @@ export default {
       this.filter = value;
     },
     confirmDelete(e) {
-      console.log(e);
       this.$message.success("Click on Yes");
     },
     async getListUsers(payload) {

@@ -39,6 +39,7 @@
 
 <script>
 import { mapFields } from "vuex-map-fields";
+import generate from "../../mixins/generate";
 
 export default {
   computed: {
@@ -50,6 +51,7 @@ export default {
       isDisableSubmit: "login.isDisableSubmit",
     }),
   },
+  mixins: [generate],
   mounted() {},
   watch: {
     form: {
@@ -129,11 +131,19 @@ export default {
           password_confirmation: this.confirmPass,
         });
         if (res) {
+          this.openNotificationWithIcon(
+            "success",
+            "Đăng kí thành công. Vui lòng vào mail để kích hoạt tài khoản",
+          );
           this.$store.commit("SET_LOADING", false);
         } else {
           this.$store.commit("SET_LOADING", false);
         }
       } catch (error) {
+        this.openNotificationWithIcon(
+          "error",
+          "Đăng kí thành công. Vui lòng vào mail để kích hoạt tài khoản",
+        );
         this.$store.commit("SET_LOADING", false);
       }
     },

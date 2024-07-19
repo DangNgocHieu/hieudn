@@ -208,7 +208,6 @@ export default {
     },
     handleSubmit() {
       this.$refs.ruleForm.validate(async (valid) => {
-        console.log(valid);
         if (valid) {
           try {
             this.$store.commit("SET_LOADING", true);
@@ -221,14 +220,13 @@ export default {
               "/laravel/auth/user/password",
               payload,
             );
-            console.log(data.message == "OK");
             if (data.message == "OK") {
               this.$store.commit("SET_LOADING", false);
               this.openNotificationWithIcon(
                 "success",
                 "Đổi mật khẩu thành công",
               );
-              this.$refs["ruleForm"].resetFields();
+              this.$refs["ruleForm"]?.resetFields();
             } else {
               this.$store.commit("SET_LOADING", false);
             }
@@ -271,7 +269,7 @@ export default {
                   }
                 }
                 this.step = 1;
-                this.$refs["ruleFormAuth"].resetFields();
+                this.$refs["ruleFormAuth"]?.resetFields();
                 this.$store.commit("SET_LOADING", false);
               } else {
                 this.$store.commit("SET_LOADING", false);
@@ -310,7 +308,7 @@ export default {
     },
     handleCancel() {
       if (!this.step) {
-        this.$refs["ruleFormAuth"].resetFields();
+        this.$refs["ruleFormAuth"]?.resetFields();
       } else {
       }
       this.isCheckbox = 1;
@@ -327,7 +325,6 @@ export default {
           "/laravel/auth/user/confirm-password",
           { password: this.ruleFormAuth.pass },
         );
-        console.log(data.data);
         if (data.message == "Created") {
           const result = await this.$axios.delete(
             "/laravel/auth/user/two-factor-authentication",
@@ -341,7 +338,7 @@ export default {
             );
             this.$store.commit("SET_LOADING", false);
             this.isShowModalPassword = false;
-            this.$refs["ruleFormAuth"].resetFields();
+            this.$refs["ruleFormAuth"]?.resetFields();
           }
         }
       } catch (error) {
@@ -354,12 +351,9 @@ export default {
     },
     handleOnComplete(value) {
       this.dataOTP = value;
-      console.log("OTP completed: ", value);
     },
     handleOnChange(value) {
       this.dataOTP = value;
-
-      console.log("OTP changed: ", value);
     },
   },
 };

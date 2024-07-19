@@ -83,8 +83,6 @@ export default {
   mixins: [generate],
   methods: {
     async handleChangeFont(info) {
-      console.log(info.file, "aaa");
-
       if (info.file.status === "uploading") {
         this.loading = true;
         return;
@@ -118,13 +116,11 @@ export default {
         this.$store.commit("SET_LOADING", true);
         let formData = new FormData();
         formData.append("image", file);
-        console.log(formData);
         const res = await this.$axios.post(
           "/laravel/me/kyc/identity_image_front",
           formData,
         );
         if (res) {
-          console.log(res);
           this.$store.commit("SET_LOADING", false);
         } else {
           this.$store.commit("SET_LOADING", false);
@@ -143,7 +139,6 @@ export default {
           formData,
         );
         if (res) {
-          console.log(res);
           this.$store.commit("SET_LOADING", false);
         } else {
           this.$store.commit("SET_LOADING", false);
