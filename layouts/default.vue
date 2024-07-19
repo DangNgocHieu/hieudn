@@ -69,8 +69,10 @@
           </span>
           <div class="menu-dropdown" :class="{ displayMenu: !isShowMenu }">
             <ul>
-              <li><a>Thông tin cá nhân</a></li>
-              <li><a>Cài đặt</a></li>
+              <li>
+                <a @click="handleRedirect('/profile')">Thông tin cá nhân</a>
+              </li>
+              <li><a @click="handleRedirect('/settings')">Cài đặt</a></li>
 
               <li><a @click="handleLogout">Đăng xuất</a></li>
             </ul>
@@ -97,6 +99,7 @@
 <script>
 import { mapFields } from "vuex-map-fields";
 export default {
+  auth: true,
   data() {
     return {
       isFocus: 0,
@@ -180,7 +183,12 @@ export default {
     async handleLogout() {
       this.$store.commit("SET_LOADING", true);
       await this.$auth.logout();
+      this.$router.push("/login");
       this.$store.commit("SET_LOADING", false);
+    },
+    handleRedirect(route) {
+      this.$router.push(route);
+      this.isShowMenu = !this.isShowMenu;
     },
   },
 };

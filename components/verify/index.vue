@@ -1,6 +1,4 @@
-<template>
-  <div>121212121212121</div>
-</template>
+<template></template>
 
 <script>
 import generate from "../../mixins/generate";
@@ -16,9 +14,6 @@ export default {
         const temp = this.$route.fullPath?.split("/")[3]?.split("?");
         const id = this.$route.fullPath?.split("/")[2];
         const hash = temp[0];
-        console.log(this.$route.fullPath);
-        console.log();
-        console.log(this.$route.fullPath.split("/")[3].split("?"));
         const res = await this.$axios.get(
           `laravel/auth/email/verify/${id}/${hash}?${temp[1]}`,
         );

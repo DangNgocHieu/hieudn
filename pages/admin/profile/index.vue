@@ -267,7 +267,6 @@ export default {
       // this.$store.commit("profile/")
     },
     handleUpdateAvatar(info) {
-      console.log("2");
       if (info.file.status === "uploading") {
         this.loading = true;
         return;

@@ -3,7 +3,11 @@
 </template>
 
 <script>
-export default {};
+export default {
+  mounted() {
+    console.log("invest");
+  },
+};
 </script>
 
 <style lang="scss" scoped></style>

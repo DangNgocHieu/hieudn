@@ -86,19 +86,15 @@ export default {
           `/laravel/packages/${this.$route.params.id}/clone`,
         );
         if (data?.data) {
-          console.log("1");
           this.$store.commit("SET_LOADING", false);
           this.$router.push(
             `/invest/recharge/customize/${this.$route.params.id}`,
           );
         } else {
-          console.log("2");
-
           this.$store.commit("SET_LOADING", false);
         }
       } catch (error) {
         console.log(error);
-        console.log("3");
         this.openNotificationWithIcon("error", error?.response?.data?.message);
         this.$store.commit("SET_LOADING", false);
       }

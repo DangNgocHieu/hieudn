@@ -71,18 +71,26 @@
             v-else
           />
         </a-form-model-item>
-        <a-form-model-item>
-          <a-button
-            class="btn-submit"
-            @click="ongChangeProfile()"
-            v-if="!isChange"
-          >
-            Thay đổi
-          </a-button>
-          <a-button class="btn-submit" @click="onSubmit" v-else>
-            Cập nhật
-          </a-button>
-        </a-form-model-item>
+        <div class="profile-block-img">
+          <div style="width: 100%" v-if="$auth.user.data.identity_image_front">
+            <div>Mặt trước</div>
+            <img
+              :src="`${$auth.user.data.identity_image_front?.replace('/api', '/laravel')}`"
+              width="300"
+              height="180"
+              alt="front_img"
+            />
+          </div>
+          <div style="width: 100%" v-if="$auth.user.data.identity_image_back">
+            <div>Mặt sau</div>
+            <img
+              :src="`${$auth.user.data.identity_image_back?.replace('/api', '/laravel')}`"
+              width="300"
+              height="180"
+              alt="back_img"
+            />
+          </div>
+        </div>
       </a-form-model>
     </a-card>
   </div>
@@ -91,6 +99,8 @@
 <script>
 import { mapFields } from "vuex-map-fields";
 import generate from "../../mixins/generate";
+import moment from "moment";
+
 export default {
   mixins: [generate],
   data() {
@@ -159,12 +169,6 @@ export default {
           {
             required: true,
             message: "Vui lòng nhập họ và tên",
-          },
-        ],
-        phone: [
-          {
-            required: true,
-            message: "Vui lòng nhập số điện thoại",
           },
         ],
         email: [
@@ -247,6 +251,31 @@ export default {
       "profile/SET_IMG_URL",
       this.$auth.user.data.avatar ? this.$auth.user.data.avatar : "",
     );
+    const {
+      name,
+      email,
+      gender,
+      address,
+      identity_number,
+      valid_date,
+      dob,
+      issue_date,
+      issue_place,
+    } = this.$auth.user.data;
+    this.formInfo = {
+      name,
+      phone: "",
+      email,
+      gender,
+      address,
+    };
+    this.formInfoCCCD = {
+      numberCCCD: identity_number,
+      birthDay: dob,
+      startDay: issue_date,
+      endDay: moment(valid_date, "DD/MM/YYYY").format("YYYY-MM-DD"),
+      addressRegisted: issue_place,
+    };
   },
   methods: {
     handleCancel() {
@@ -265,7 +294,6 @@ export default {
       // this.$store.commit("profile/")
     },
     handleUpdateAvatar(info) {
-      console.log("2");
       if (info.file.status === "uploading") {
         this.loading = true;
         return;
@@ -282,7 +310,6 @@ export default {
       }
     },
     async beforeUpload(file) {
-      console.log(file.type, "file.type");
       const isJpgOrPng = ["image/jpg", "image/png", "image/jpeg"].includes(
         file.type,
       );
@@ -354,5 +381,10 @@ export default {
   .image-child {
     position: absolute;
   }
+}
+.profile-block-img {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 20px;
 }
 </style>

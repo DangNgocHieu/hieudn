@@ -28,6 +28,7 @@ export default {
       loading: "loading",
     }),
   },
+  auth: false,
 };
 </script>
 
