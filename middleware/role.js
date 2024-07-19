@@ -4,9 +4,9 @@ export default function ({ store, redirect, $auth, route }) {
   const userDashboard = "/dashboard";
 
   // Prevent redirection if the user is already on the target page
-  if (userRole === 1 && route.path !== adminDashboard) {
+  if (userRole === 1) {
     return redirect(adminDashboard);
-  } else if (userRole !== 1 && route.path !== userDashboard) {
+  } else {
     return redirect(userDashboard);
   }
 }
