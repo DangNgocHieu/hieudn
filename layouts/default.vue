@@ -97,7 +97,6 @@
 <script>
 import { mapFields } from "vuex-map-fields";
 export default {
-  middleware: ["role"],
   data() {
     return {
       isFocus: 0,
