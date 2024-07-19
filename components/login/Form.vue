@@ -128,6 +128,7 @@ export default {
                   "success",
                   "Đăng nhập thành công",
                 );
+                this.$router.push("/dashboard");
               } else {
                 this.$store.commit("SET_LOADING", false);
               }
