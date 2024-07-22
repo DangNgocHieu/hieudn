@@ -140,10 +140,7 @@ export default {
           this.$store.commit("SET_LOADING", false);
         }
       } catch (error) {
-        this.openNotificationWithIcon(
-          "error",
-          "Đăng kí thành công. Vui lòng vào mail để kích hoạt tài khoản",
-        );
+        this.openNotificationWithIcon("error", "Đăng kí không thành công");
         this.$store.commit("SET_LOADING", false);
       }
     },
