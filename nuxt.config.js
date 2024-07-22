@@ -95,7 +95,7 @@ export default {
   proxy: {
     "/laravel": {
       target:
-        "https://vigilant-space-yodel-65g99v7rj4xc4799-80.app.github.dev/api/",
+        "https://glowing-space-meme-r6g447vr9xvfx6xg-80.app.github.dev/api/",
       pathRewrite: { "^/laravel": "/" },
     },
   },

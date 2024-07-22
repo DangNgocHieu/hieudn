@@ -11,7 +11,7 @@
             <button
               v-for="(el, key) in dataCertificate"
               :key="key"
-              :class="[{ 'active-button': key === isActive }]"
+              :class="[{ 'active-button': el.id === isActive }]"
               @click="handleChangeButton(el.id)"
             >
               {{ el.code }}
@@ -71,6 +71,7 @@ export default {
   mounted() {
     this.createChart();
     this.initData();
+    this.handleCallApiChart(1);
   },
   methods: {
     async initData() {
@@ -79,6 +80,7 @@ export default {
         const { data } = await this.$axios.get("/laravel/funds");
         if (data.data) {
           this.dataCertificate = data.data;
+          this.isActive = data.data[0]?.id;
           this.handleCallApiDetail(1);
           this.$store.commit("SET_LOADING", false);
         } else {
@@ -102,10 +104,26 @@ export default {
         this.$store.commit("SET_LOADING", false);
       }
     },
+    async handleCallApiChart(id) {
+      this.$store.commit("SET_LOADING", true);
+      try {
+        const { data } = await this.$axios.get(
+          `/laravel/funds/${id}/history?month=1`,
+        );
+        if (data.data) {
+          this.$store.commit("SET_LOADING", false);
+        } else {
+          this.$store.commit("SET_LOADING", false);
+        }
+      } catch (error) {
+        this.$store.commit("SET_LOADING", false);
+      }
+    },
     handleChangeButton(index) {
       console.log(index);
-      this.isActive = index - 1;
+      this.isActive = index;
       this.handleCallApiDetail(index);
+      this.handleCallApiChart(index);
     },
     handleChangeTab(e) {
       this.indexChart = e;
