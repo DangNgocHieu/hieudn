@@ -1,5 +1,5 @@
 <template>
-  <div>Funds</div>
+  <manager-funds />
 </template>
 
 <script>
