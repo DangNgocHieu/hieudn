@@ -2,11 +2,11 @@
 
 <script>
 export default {
-  auth: "",
+  // auth: "",
   name: "IndexPage",
 
-  middleware({ $auth, redirect }) {
-    redirect("/login");
-  },
+  // middleware({ $auth, redirect }) {
+  //   redirect("/login");
+  // },
 };
 </script>

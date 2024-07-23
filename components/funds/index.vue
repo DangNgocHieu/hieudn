@@ -11,20 +11,16 @@
             <button
               v-for="(el, key) in dataCertificate"
               :key="key"
-              :class="[{ 'active-button': key === isActive }]"
+              :class="[{ 'active-button': el.id === isActive }]"
               @click="handleChangeButton(el.id)"
             >
-              {{ el.name }}
+              {{ el.code }}
             </button>
           </div>
         </div>
         <div class="right-tc">
-          <a-card title="Quỹ đầu tư trái phiếu TCBF (TCBF)">
-            <span
-              >Quỹ đầu tư trái phiếu TCBF chuyển trái phiếu doanh nghiệp, chứng
-              chỉ tiền gửi, tín phiếu tốt nhất thị trường để tạo nguồn thu nhập
-              ổn định dài hạn</span
-            >
+          <a-card :title="dataLabel.name">
+            <span>{{ dataLabel.description }}</span>
           </a-card>
           <a-tabs default-active-key="1" @change="(e) => handleChangeTab(e)">
             <a-tab-pane tab="1 tháng" key="1"> </a-tab-pane>
@@ -46,27 +42,11 @@ export default {
   data() {
     return {
       isActive: 0,
-      dataCertificate: [
-        {
-          name: "TCBF",
-          id: 0,
-        },
-        {
-          name: "TCFF",
-          id: 1,
-        },
-        {
-          name: "TCEF",
-          id: 2,
-        },
-        {
-          name: "TCFIN",
-          id: 3,
-        },
-      ],
+      dataCertificate: [],
       dataChart: [1, 2, 3, 4, 5, 6, 7],
       indexChart: 1,
       myChart: null,
+      dataLabel: {},
     };
   },
 
@@ -84,17 +64,66 @@ export default {
       if (value == 4) {
         this.dataChart = [21, 22, 24, 23, 25, 26, 27];
       }
-      console.log(value, "11");
       this.myChart.destroy();
       this.createChart();
     },
   },
   mounted() {
     this.createChart();
+    this.initData();
+    this.handleCallApiChart(1);
   },
   methods: {
+    async initData() {
+      try {
+        this.$store.commit("SET_LOADING", true);
+        const { data } = await this.$axios.get("/laravel/funds");
+        if (data.data) {
+          this.dataCertificate = data.data;
+          this.isActive = data.data[0]?.id;
+          this.handleCallApiDetail(1);
+          this.$store.commit("SET_LOADING", false);
+        } else {
+          this.$store.commit("SET_LOADING", false);
+        }
+      } catch (error) {
+        this.$store.commit("SET_LOADING", false);
+      }
+    },
+    async handleCallApiDetail(id) {
+      this.$store.commit("SET_LOADING", true);
+      try {
+        const { data } = await this.$axios.get(`/laravel/funds/${id}`);
+        if (data.data) {
+          this.dataLabel = data.data;
+          this.$store.commit("SET_LOADING", false);
+        } else {
+          this.$store.commit("SET_LOADING", false);
+        }
+      } catch (error) {
+        this.$store.commit("SET_LOADING", false);
+      }
+    },
+    async handleCallApiChart(id) {
+      this.$store.commit("SET_LOADING", true);
+      try {
+        const { data } = await this.$axios.get(
+          `/laravel/funds/${id}/history?month=1`,
+        );
+        if (data.data) {
+          this.$store.commit("SET_LOADING", false);
+        } else {
+          this.$store.commit("SET_LOADING", false);
+        }
+      } catch (error) {
+        this.$store.commit("SET_LOADING", false);
+      }
+    },
     handleChangeButton(index) {
+      console.log(index);
       this.isActive = index;
+      this.handleCallApiDetail(index);
+      this.handleCallApiChart(index);
     },
     handleChangeTab(e) {
       this.indexChart = e;

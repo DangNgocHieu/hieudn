@@ -94,7 +94,8 @@ export default {
   },
   proxy: {
     "/laravel": {
-      target: "https://sturdy-broccoli-r6g447vr9w5c5vpv-80.app.github.dev/api/",
+      target:
+        "https://glowing-space-meme-r6g447vr9xvfx6xg-80.app.github.dev/api/",
       pathRewrite: { "^/laravel": "/" },
     },
   },
@@ -102,8 +103,7 @@ export default {
   auth: {
     redirect: {
       login: "/login",
-      logout: "/login/",
-      home: "/dashboard",
+      logout: "/login",
     },
     strategies: {
       laravelSanctum: {
@@ -133,12 +133,12 @@ export default {
           },
         },
         user: {
-          autoFetch: false
-        }
+          autoFetch: false,
+        },
       },
     },
   },
   router: {
-    middleware: ["auth"],
+    middleware: ["checkRole"],
   },
 };

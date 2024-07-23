@@ -4,6 +4,7 @@
 
 <script>
 export default {
+  auth: false,
   name: "Login",
   layout: "authLayout",
 };

@@ -77,7 +77,7 @@ export default {
   },
   mounted() {
     this.$nextTick(() => {
-      this.$refs.ruleForm.resetFields();
+      this.$refs.ruleForm?.resetFields();
     });
   },
   watch: {
@@ -106,7 +106,6 @@ export default {
       this.$store.commit("SET_LOADING", true);
       this.$refs.ruleForm.validate(async (valid) => {
         if (valid) {
-          console.log(valid);
           try {
             const res = await this.$auth.loginWith("laravelSanctum", {
               data: {
@@ -115,25 +114,34 @@ export default {
                 password: this.password,
               },
             });
-            console.log(res, "res");
             if (res.data.data.two_factor) {
               this.$router.push("/2fa");
               this.$store.commit("SET_LOADING", false);
             } else {
               const { data } = await this.$auth.fetchUser();
-              console.log(data, "dataaaaaaa");
+              console.log(data, "data");
               if (data) {
                 this.$store.commit("SET_LOADING", false);
                 this.openNotificationWithIcon(
                   "success",
                   "Đăng nhập thành công",
                 );
+                console.log(
+                  this.$auth.user.data.is_verify,
+                  "his.$auth.user.data.is_verify",
+                );
+                if (!this.$auth.user.data.is_verify) {
+                  this.$router.push("/ekyc");
+                } else if (this.$auth.user.data.role) {
+                  this.$router.push("/admin/dashboard");
+                } else {
+                  this.$router.push("/dashboard");
+                }
               } else {
                 this.$store.commit("SET_LOADING", false);
               }
             }
           } catch (error) {
-            console.log(error, "asdasdasdasds");
             if (error?.response?.status === 403) {
               this.openNotificationWithIcon(
                 "error",

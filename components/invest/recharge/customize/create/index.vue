@@ -148,7 +148,6 @@ export default {
       );
     },
     handleCancelChoose(value) {
-      console.log(value, "value");
       this.dataFunds = this.dataFunds.map((el) =>
         el.id == value.id ? { ...el, isChoose: false, value: 0 } : el,
       );
@@ -178,8 +177,8 @@ export default {
           this.$store.commit("SET_LOADING", false);
           this.dataFunds = this.dataFundsInit;
           this.name = "";
-          Object.assign(this.dataChart, [0,0,0,0])
-           
+          Object.assign(this.dataChart, [0, 0, 0, 0]);
+
           this.myChartCreate.update();
         } else {
           this.$store.commit("SET_LOADING", false);

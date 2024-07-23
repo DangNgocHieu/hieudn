@@ -134,7 +134,6 @@ export default {
       try {
         this.$store.commit("SET_LOADING", true);
         const res = await this.$axios.get("/laravel/me/assets");
-        console.log(res.data.data);
         if (res.data.data) {
           this.$store.commit("SET_LOADING", false);
           this.assetInvest = res.data.data;

@@ -351,9 +351,7 @@ export default {
       }
       this.$store.commit("customize/SET_IS_OPEN_MODAL", !this.isOpenModal);
     },
-    handleOk() {
-      console.log("11");
-    },
+    handleOk() {},
     async handleSubmit(type) {
       //typemodal == 1 => nap
       if (this.step === 3 && this.typeModal === 3) {

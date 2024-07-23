@@ -1,5 +1,5 @@
 <template>
-  <ekyc />
+  <Ekyc />
 </template>
 
 <script>
