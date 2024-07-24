@@ -5,8 +5,12 @@
       <ManagerUsersFilters
         :filter="filter"
         @search="handleSearch"
-        @add="handleAddUser"
+        @add="openModal"
+        @reload="handleSearch"
       />
+      <a-modal :footer="null" v-model="visible" title="Thêm người dùng">
+        <ManagerUsersCreateForm ref="addForm" @handleSubmit="handleAddUser" />
+      </a-modal>
     </div>
     <a-table
       :columns="columns"
@@ -14,7 +18,6 @@
       :row-selection="rowSelection"
       :pagination="pagination"
       :loading="loading"
-      @change="handleTableChange"
       :style="'background-color:#fff'"
     >
       <template slot="key" slot-scope="record, text, index">
@@ -36,12 +39,12 @@
           {{ getStatusKyc(is_verify).text }}
         </a-tag>
       </a>
+      <span slot="created_at" slot-scope="created_at"
+        >{{ moment(created_at).format("DD-MM-YYYY") }}
+      </span>
       <a slot="actions" slot-scope="data">
         <div>
-          <a-button
-            type="primary"
-            @click="$router.push(`/admin/manager-users/${data.id}`)"
-          >
+          <a-button type="primary" @click="redirectDetail(data)">
             Chi tiết
           </a-button>
 
@@ -50,18 +53,25 @@
             ok-text="Xóa"
             cancel-text="Hủy"
             okType="danger"
-            @confirm="confirmDelete"
+            @confirm="confirmDelete(data)"
             @cancel="cancel"
           >
             <a-button type="danger"> Xóa </a-button>
           </a-popconfirm>
-          <a-button> Hủy kích hoạt </a-button>
+          <a-button
+            :type="data?.is_activated ? 'danger' : 'primary'"
+            ghost
+            @click="handleUpdateStatus(data)"
+          >
+            {{ data?.is_activated ? "Hủy kích hoạt" : "Kích hoạt" }}
+          </a-button>
         </div></a
       >
     </a-table>
   </div>
 </template>
 <script>
+import moment from "moment";
 const columns = [
   {
     title: "STT",
@@ -71,11 +81,13 @@ const columns = [
   },
   {
     title: "Email",
+    width: 240,
     dataIndex: "email",
     key: "email",
   },
   {
     title: "Họ và tên",
+    width: 180,
     dataIndex: "name",
     key: "name",
   },
@@ -101,8 +113,9 @@ const columns = [
   },
   {
     title: "Ngày tạo tài khoản",
-    dataIndex: "created_date",
-    key: "created_date",
+    dataIndex: "created_at",
+    key: "created_at",
+    scopedSlots: { customRender: "created_at" },
     width: 200,
   },
   {
@@ -132,16 +145,18 @@ export default {
     return {
       data,
       columns,
-      filter: "",
+      filter: { sort_by: "desc", per_page: 10 },
       rowSelection,
       loading: false,
       pagination: {},
+      visible: false,
     };
   },
   mounted() {
     this.getListUsers();
   },
   methods: {
+    moment,
     getStatus(status) {
       return {
         color: !status ? "orange" : "green",
@@ -163,14 +178,28 @@ export default {
     handleChange(value) {
       this.filter = value;
     },
-    confirmDelete(e) {
-      this.$message.success("Click on Yes");
+    redirectDetail(data) {
+      this.$store.commit("admin/SET_DETAIL", data);
+      this.$router.push(`/admin/manager-users/${data.id}`);
     },
-    async getListUsers(payload) {
+    async confirmDelete(data) {
+      try {
+        const response = await this.$axios.delete(
+          `laravel/admin/users/${data.id}`,
+        );
+        if (response.data.data) {
+          this.getListUsers();
+          this.$message.success("Đã xóa người dùng.");
+        }
+      } catch (error) {
+        this.$message.error("Xóa người dùng thất bại.");
+      }
+    },
+    async getListUsers() {
       this.loading = true;
       try {
         const response = await this.$axios.get("laravel/admin/users", {
-          params: { ...payload },
+          params: this.filter,
         });
         if (response) {
           this.data = response?.data?.data?.data;
@@ -185,10 +214,45 @@ export default {
       }
     },
     handleSearch() {
-      this.getListUsers({ ...this.filter });
+      this.getListUsers(this.filter);
     },
-    handleAddUser() {
-      console.log(123);
+    openModal() {
+      this.visible = true;
+    },
+    async handleAddUser(form) {
+      this.loading = true;
+      try {
+        const response = await this.$axios.post("laravel/admin/users", form);
+        if (response.data.data) {
+          this.$message.success("Thêm người dùng thành công.");
+          this.getListUsers();
+        }
+      } catch (error) {
+        this.$message.error(
+          error?.response?.data?.message || "Thêm người dùng thất bại.",
+        );
+      } finally {
+        this.loading = false;
+        this.visible = false;
+        this.$refs.addForm.resetForm();
+      }
+    },
+    async handleUpdateStatus(data) {
+      const status = !data.is_activated ? "kích hoạt" : "hủy kích hoạt";
+      try {
+        const response = await this.$axios.put(
+          `laravel/admin/users/${data.id}`,
+          {
+            active: !data.is_activated,
+          },
+        );
+        if (response.data.data) {
+          this.getListUsers();
+          this.$message.success(`Đã ${status} thành công.`);
+        }
+      } catch (error) {
+        this.$message.error(`${status} thất bại.`);
+      }
     },
   },
 };

@@ -142,6 +142,7 @@ export default {
     handleChange(value) {
       this.filter = value;
     },
+    handleOk() {},
   },
 };
 </script>

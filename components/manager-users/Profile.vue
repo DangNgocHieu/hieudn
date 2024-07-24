@@ -33,10 +33,12 @@
       </a-modal>
     </a-card>
     <a-card title="Trạng thái tài khoản">
-      <span>Đã kích hoạt</span>
+      <span>{{
+        details.is_activated ? "Đã kích hoạt" : "Chưa kích hoạt"
+      }}</span>
     </a-card>
     <a-card title="Thông tin cá nhân">
-      <a-form-model ref="formInfo" :model="formInfo" :rules="rulesInfo">
+      <a-form-model ref="details" :model="details" :rules="rulesInfo">
         <a-form-model-item
           :ref="el.ref"
           :label="el.label"
@@ -44,7 +46,7 @@
           v-for="(el, key) in dataFormInfo"
           :key="key"
         >
-          <a-input v-model="formInfo[el.ref]" :disabled="!isChange" />
+          <a-input v-model="details[el.ref]" :disabled="!isChange" />
         </a-form-model-item>
       </a-form-model>
     </a-card>
@@ -246,6 +248,7 @@ export default {
     ...mapFields({
       isChange: "profile.isChange",
       imageUrl: "profile.imageUrl",
+      details: "admin.details",
     }),
   },
   mounted() {},
