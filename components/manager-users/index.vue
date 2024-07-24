@@ -58,13 +58,19 @@
           >
             <a-button type="danger"> Xóa </a-button>
           </a-popconfirm>
-          <a-button
-            :type="data?.is_activated ? 'danger' : 'primary'"
-            ghost
-            @click="handleUpdateStatus(data)"
+
+          <a-popconfirm
+            :title="`Bạn có muốn ${data?.is_activated ? 'hủy kích hoạt' : 'kích hoạt'} tài khoản này không?`"
+            ok-text="Xác nhận"
+            cancel-text="Hủy"
+            :okType="data?.is_activated ? 'danger' : 'primary'"
+            @confirm="handleUpdateStatus(data)"
+            @cancel="cancel"
           >
-            {{ data?.is_activated ? "Hủy kích hoạt" : "Kích hoạt" }}
-          </a-button>
+            <a-button :type="data?.is_activated ? 'danger' : 'primary'" ghost>
+              {{ data?.is_activated ? "Hủy kích hoạt" : "Kích hoạt" }}
+            </a-button>
+          </a-popconfirm>
         </div></a
       >
     </a-table>
@@ -238,6 +244,7 @@ export default {
       }
     },
     async handleUpdateStatus(data) {
+      this.loading = true;
       const status = !data.is_activated ? "kích hoạt" : "hủy kích hoạt";
       try {
         const response = await this.$axios.put(
@@ -252,6 +259,8 @@ export default {
         }
       } catch (error) {
         this.$message.error(`${status} thất bại.`);
+      } finally {
+        this.loading = false;
       }
     },
   },
