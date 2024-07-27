@@ -56,7 +56,10 @@
         </template>
       </a-card>
       <div class="footer">
-        <a-button @click="handleCreatePackage" :disabled="isDisable !== 100"
+        <a-button
+          class="btn-create"
+          @click="handleCreatePackage"
+          :disabled="isDisable !== 100"
           >Tạo</a-button
         >
       </div>
@@ -66,8 +69,10 @@
 
 <script>
 import { Chart, registerables } from "chart.js";
+import generate from "../../../../../mixins/generate";
 Chart.register(...registerables);
 export default {
+  mixins: [generate],
   data() {
     return {
       dataFundsInit: [],
@@ -98,7 +103,6 @@ export default {
       try {
         this.$store.commit("SET_LOADING", true);
         const res = await this.$axios.get("/laravel/funds");
-        console.log(res);
         if (res) {
           const data = res?.data?.data.map((el) => {
             return { ...el, isChoose: false, value: 0, type: el.code };
@@ -126,7 +130,7 @@ export default {
                 "rgb(255, 99, 132)",
                 "rgb(54, 162, 235)",
                 "rgb(255, 205, 86)",
-                "rgb(255, 205, 0)",
+                "rgb(0,128,0)",
               ],
               hoverOffset: 4,
             },
@@ -178,12 +182,19 @@ export default {
           this.dataFunds = this.dataFundsInit;
           this.name = "";
           Object.assign(this.dataChart, [0, 0, 0, 0]);
-
           this.myChartCreate.update();
+          this.openNotificationWithIcon("success", "Tạo gói thành công");
         } else {
           this.$store.commit("SET_LOADING", false);
         }
       } catch (error) {
+        if (error.response.status === 422) {
+          this.openNotificationWithIcon(
+            "error",
+            "Vui lòng nhập tên gói > 3 kí tự",
+          );
+        }
+
         console.log(error);
         this.$store.commit("SET_LOADING", false);
       }
@@ -213,5 +224,13 @@ canvas {
     width: 50px;
     margin-right: 10px;
   }
+}
+.footer {
+  display: flex;
+  justify-content: end;
+  padding-top: 10px;
+}
+.btn-create {
+  width: 100px;
 }
 </style>

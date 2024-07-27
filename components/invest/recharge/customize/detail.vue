@@ -34,7 +34,14 @@
         <div class="investment">
           <div class="">
             <div class="">
-              <div>{{ dataDetail?.investment_amount }}</div>
+              <div>
+                {{
+                  dataDetail?.investment_amount
+                    ? dataDetail?.investment_amount
+                    : "0"
+                }}
+                đ
+              </div>
             </div>
             <br />
             <div class="investment_amount">
@@ -54,10 +61,10 @@
                 />
                 <div>Nạp tiền</div>
               </div>
-              <div class="text-medium">
+              <div class="text-medium" v-if="dataDetail?.investment_amount">
                 <a-icon
                   @click="showModal('rut')"
-                  type="plus"
+                  type="arrow-down"
                   style="
                     padding: 0.8rem;
                     font-size: 1.2rem;
@@ -84,15 +91,33 @@
         </div>
         <br />
       </div>
-      <div class="invest_customize_detail">
+      <!-- <div class="invest_customize_detail">
         <br />
         <div class="invest_customize_detail--title">Lịch sử giao dịch</div>
         <a-table
-          :dataSource="dataSource || dataDetail.transactions"
+          :dataSource="dataDetail?.transactions"
           :columns="columns"
           class="table-history"
-        />
-      </div>
+        >
+          <span
+            style="font-weight: bold"
+            slot="created_at"
+            slot-scope="created_at"
+            >{{ formatDate(created_at) }}</span
+          >
+          <div style="font-weight: bold" slot="price" slot-scope="price">
+            {{
+              price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                ? price?.toString()?.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : 0
+            }}
+            đ
+          </div>
+          <div style="font-weight: bold" slot="volume" slot-scope="volume">
+            {{ volume ? volume : "0" }}
+          </div>
+        </a-table>
+      </div> -->
     </div>
 
     <a-modal
@@ -107,12 +132,7 @@
       :ok-button-props="{ props: { disabled: disableMoney } }"
     >
       <div v-if="step === 1">
-        <a-form-model
-          ref="ruleForm"
-          :model="formMoney"
-          @submit="handleSubmit()"
-          :rules="rules"
-        >
+        <a-form-model ref="ruleForm" :model="formMoney" :rules="rules">
           <a-form-model-item
             label="Số tiền"
             ref="moneyAmount"
@@ -183,8 +203,21 @@
 
         <br />
         <br />
-        <a-input v-model="account_id" placeholder="Vui lòng nhập số tài khoản">
-        </a-input>
+        <div :style="'padding-bottom:10px'">Số tài khoản</div>
+        <a-input
+          v-model="account_id"
+          placeholder="Vui lòng nhập số tài khoản"
+        />
+        <br />
+        <br />
+        <div v-if="namePeopleBank">
+          <div>Chủ tài khoản</div>
+          <a-input v-model="namePeopleBank" :disabled="true" />
+        </div>
+      </div>
+      <div v-if="step === 4" class="modal-password">
+        <div>Nhập mật khẩu để tiến hành rút tiền</div>
+        <a-input v-model="password" type="password"></a-input>
       </div>
     </a-modal>
   </div>
@@ -212,6 +245,8 @@ export default {
       typeModal: "customize.typeModal",
       bank_id: "customize.bank_id",
       account_id: "customize.account_id",
+      namePeopleBank: "customize.namePeopleBank",
+      password: "customize.password",
     }),
     disableMoney() {
       const regex = /^\d+$/;
@@ -237,43 +272,35 @@ export default {
           label: "Ngân hàng TMCP Tiên Phong (Tpbank)",
           value: "970423",
         },
-      ],
-      dataSource: [
         {
-          key: "1",
-          name: "Mike",
-          age: 32,
-          address: "10 Downing Street",
-          abc: "1",
-        },
-        {
-          key: "2",
-          name: "John",
-          age: 42,
-          address: "10 Downing Street",
-          abc: "2",
+          label: "Ngân hàng TMCP Á Châu",
+          value: "970416",
         },
       ],
+
       columns: [
         {
           title: "Ngày giao dịch",
-          dataIndex: "name",
-          key: "name",
+          dataIndex: "created_at",
+          key: "created_at ",
+          scopedSlots: { customRender: "created_at" },
         },
         {
           title: "Số tham chiếu",
-          dataIndex: "age",
-          key: "age",
+          dataIndex: "transaction_id",
+          key: "transaction_id",
         },
         {
-          title: "Số lần giao dịch",
-          dataIndex: "address",
-          key: "address",
+          title: "Số tiền giao dịch",
+          dataIndex: "price",
+          key: "price",
+          scopedSlots: { customRender: "price" },
         },
         {
-          title: "Số lượng CCCQ",
-          dataIndex: "abc",
-          key: "abc",
+          title: "Số lượng CCQ",
+          dataIndex: "volume",
+          key: "volume",
+          scopedSlots: { customRender: "volume" },
         },
       ],
       dataChart: [],
@@ -354,24 +381,56 @@ export default {
     handleOk() {},
     async handleSubmit(type) {
       //typemodal == 1 => nap
+      if (this.step == 1 && this.typeModal == 2) {
+        this.step = 3;
+        this.$store.commit("customize/SET_TYPE_MODAL", 3);
+        return;
+      }
       if (this.step === 3 && this.typeModal === 3) {
         this.$store.commit("SET_LOADING", true);
-
         try {
           const res = await this.$axios.get(
             `/laravel/banks/${this.bank_id}/${this.account_id}`,
           );
           if (res?.data?.data) {
+            this.$store.commit(
+              "customize/SET_NAME_PEOPLE_BANK",
+              res.data.data.name,
+            );
             this.$store.commit("SET_LOADING", false);
+            //confirm password
+
+            setTimeout(() => {
+              this.step = 4;
+              this.typeModal = 4;
+            }, 3000);
           } else {
             this.$store.commit("SET_LOADING", false);
           }
         } catch (error) {
           this.openNotificationWithIcon(
-            "errors",
+            "error",
             error?.response?.data?.message,
           );
+          this.$store.commit("SET_LOADING", false);
+        }
+      }
+      if (this.step === 4) {
+        this.$store.commit("SET_LOADING", true);
+        try {
+          const res = await this.$axios.post(
+            "/laravel/auth/user/confirm-password",
+            { password: this.password },
+          );
 
+          if (res?.data.status == 201) {
+            await this.onWithdrawMoney();
+
+            this.$store.commit("SET_LOADING", false);
+          } else {
+            this.$store.commit("SET_LOADING", false);
+          }
+        } catch (error) {
           this.$store.commit("SET_LOADING", false);
         }
       }
@@ -394,25 +453,43 @@ export default {
         } catch (error) {
           this.$store.commit("SET_LOADING", false);
         }
-      } else {
-        this.step = 3;
-        this.$store.commit("customize/SET_TYPE_MODAL", 3);
       }
       //call api rut tien
     },
+    async onWithdrawMoney() {
+      try {
+        const res = await this.$axios.post(
+          `/laravel/packages/${this.$route.params.id}/withdraw`,
+          {
+            bank_id: this.bank_id,
+            bank_account_id: this.account_id,
+            amount: this.formMoney.moneyAmount,
+          },
+        );
+        if (res) {
+          this.openNotificationWithIcon(
+            "success",
+            "Bạn đã tạo lệnh rút tiền thành công!",
+          );
+          this.$store.commit("customize/SET_IS_OPEN_MODAL", false);
+        }
+      } catch (error) {
+        this.openNotificationWithIcon("error", error?.response?.data.message);
+      }
+    },
     handleCancel() {
-      this.isOpenModal = false;
-      this.step = 1;
-      this.moneyAmount = null;
+      this.$store.commit("customize/SET_IS_OPEN_MODAL", false);
+      this.$store.commit("customize/SET_STEP", 1);
+      this.$store.commit("customize/SET_MONEY_AMOUNT", null);
       this.$store.commit("customize/SET_TYPE_MODAL", 0);
       this.$store.commit("customize/SET_BANK_ID", "");
       this.$store.commit("customize/SET_ACCOUNT_ID", "");
+      this.$store.commit("customize/SET_NAME_PEOPLE_BANK", "");
+      this.$store.commit("customize/SET_PASSWORD", "");
     },
     handleSelectBank(value) {
       this.bank_id = this.list_bank[value].value;
     },
-    onFinish() {},
-    onFinishFailed() {},
   },
 };
 </script>

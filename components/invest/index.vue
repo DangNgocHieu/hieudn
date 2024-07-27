@@ -7,7 +7,7 @@
         {{
           assetInvest?.balance
             ? formatCurrency(assetInvest?.balance) + " đ"
-            : "-1111"
+            : "-"
         }}
       </div>
       <div class="invest__block__method">
@@ -105,7 +105,7 @@
         </p>
       </div>
 
-      <p class="recharge-detail" @click="handleCustomize(item.id)">
+      <p class="recharge-detail" @click="handleCustomize(item.package_id)">
         Xem chi tiết >
       </p>
     </a-card>

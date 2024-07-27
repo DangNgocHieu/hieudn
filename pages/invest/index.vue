@@ -4,9 +4,7 @@
 
 <script>
 export default {
-  mounted() {
-    console.log("invest");
-  },
+  mounted() {},
 };
 </script>
 
