@@ -115,20 +115,16 @@ export default {
               },
             });
             if (res.data.data.two_factor) {
+              console.log("bbbb");
               this.$router.push("/2fa");
               this.$store.commit("SET_LOADING", false);
             } else {
               const { data } = await this.$auth.fetchUser();
-              console.log(data, "data");
               if (data) {
                 this.$store.commit("SET_LOADING", false);
                 this.openNotificationWithIcon(
                   "success",
                   "Đăng nhập thành công",
-                );
-                console.log(
-                  this.$auth.user.data.is_verify,
-                  "his.$auth.user.data.is_verify",
                 );
                 if (!this.$auth.user.data.is_verify) {
                   this.$router.push("/ekyc");
@@ -138,10 +134,14 @@ export default {
                   this.$router.push("/dashboard");
                 }
               } else {
+                this.openNotificationWithIcon("error", "CSRF token mismatch.");
                 this.$store.commit("SET_LOADING", false);
               }
             }
           } catch (error) {
+            if (error?.response?.status === 502) {
+              this.openNotificationWithIcon("error", "Server error");
+            }
             if (error?.response?.status === 403) {
               this.openNotificationWithIcon(
                 "error",

@@ -7,48 +7,55 @@
         style="min-width: 120px"
         @change="handleChange"
       >
-        <a-select-option value="1"> Jack </a-select-option>
-        <a-select-option value="2"> Lucy </a-select-option>
-        <a-select-option value="3"> yiminghe </a-select-option>
+        <a-select-option value="1"> Tăng dần </a-select-option>
+        <a-select-option value="2"> Giảm dần </a-select-option>
       </a-select>
     </div>
     <a-table
       :columns="columns"
-      :data-source="data"
+      :data-source="dataHistory"
       :style="'background-color:#fff'"
     >
+      <span slot="amount" slot-scope="transfer_amount">{{
+        `${new Intl.NumberFormat("ja-JP").format(transfer_amount)} đ`
+      }}</span>
       <a slot="name" slot-scope="text">{{ text }}</a>
       <a slot="status" slot-scope="status"
         ><a-tag :color="getStatus(status).color">
           {{ getStatus(status).text }}
         </a-tag>
       </a>
-      <a slot="actions">Chi tiết</a>
+      <a slot="actions" slot-scope="actions" @click="handleGoToDetail(actions)"
+        >Chi tiết</a
+      >
     </a-table>
   </div>
 </template>
 <script>
+import { mapFields } from "vuex-map-fields";
+
 const columns = [
   {
     title: "Ngày giao dịch",
-    dataIndex: "date",
+    dataIndex: "created_at",
     key: "date",
     scopedSlots: { customRender: "date" },
   },
   {
     title: "Số tham chiếu",
-    dataIndex: "reference",
+    dataIndex: "reference_number",
     key: "reference",
   },
   {
     title: "Số tiền giao dịch",
-    dataIndex: "amount",
+    dataIndex: "transfer_amount",
     key: "amount",
     ellipsis: true,
+    scopedSlots: { customRender: "amount" },
   },
   {
     title: "Trạng thái",
-    dataIndex: "status",
+    dataIndex: "payment_status",
     key: "status",
     scopedSlots: { customRender: "status" },
   },
@@ -59,48 +66,48 @@ const columns = [
     scopedSlots: { customRender: "actions" },
   },
 ];
-
-const data = [
-  {
-    key: "1",
-    date: "04/07/2024",
-    reference: 32,
-    amount: "100đ",
-    status: 1,
-  },
-  {
-    key: "2",
-    date: "04/07/2024",
-    reference: 42,
-    amount: "100đ",
-    status: 2,
-  },
-  {
-    key: "3",
-    date: "04/07/2024",
-    reference: 32,
-    amount: "100đ",
-    status: 1,
-  },
-];
-
 export default {
   data() {
     return {
-      data,
       columns,
       filter: "",
     };
   },
+  computed: {
+    ...mapFields({
+      dataHistory: "history.dataHistory",
+    }),
+  },
+  mounted() {
+    this.initPage();
+  },
   methods: {
+    async initPage() {
+      try {
+        this.$store.commit("SET_LOADING", true);
+        const { data } = await this.$axios("/laravel/transactions");
+        if (data.data) {
+          this.$store.commit("history/SET_DATA_HISTORY", data.data);
+          this.$store.commit("SET_LOADING", false);
+        } else {
+          this.$store.commit("SET_LOADING", false);
+        }
+      } catch (error) {
+        this.$store.commit("SET_LOADING", false);
+      }
+    },
     getStatus(status) {
       return {
-        color: status === 1 ? "orange" : "green",
-        text: status === 1 ? "Đang chờ" : "Đã xác nhận",
+        color: status == -1 ? "red" : status == 1 ? "green" : "orange",
+        text:
+          status == -1 ? "Thất bại" : status == 1 ? "Đã xác nhận" : "Đang chờ",
       };
     },
     handleChange(value) {
       this.filter = value;
+    },
+    handleGoToDetail(id) {
+      this.$router.push(`/history/${id.reference_number}`);
     },
   },
 };

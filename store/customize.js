@@ -12,6 +12,8 @@ const INIT_STATE = {
   typeModal: 0,
   bank_id: "",
   account_id: "",
+  namePeopleBank: '',
+  password: ""
 };
 
 export const state = () => cloneDeep(INIT_STATE);
@@ -48,7 +50,7 @@ export const mutations = {
     state.isOpenModal = payload;
   },
   SET_MONEY_AMOUNT(state, payload) {
-    state.formState.moneyAmount = payload;
+    state.formMoney.moneyAmount = payload;
   },
   SET_TYPE_MODAL(state, payload) {
     state.typeModal = payload;
@@ -58,6 +60,15 @@ export const mutations = {
   },
   SET_ACCOUNT_ID(state, payload) {
     state.account_id = payload;
+  },
+  SET_NAME_PEOPLE_BANK(state, payload) {
+    state.namePeopleBank = payload;
+  },
+  SET_PASSWORD(state, payload) {
+    state.password = payload;
+  },
+  SET_STEP(state, payload) {
+    state.step = payload;
   },
 };
 export const getters = {

@@ -27,7 +27,7 @@ export default {
     },
     formatCurrency(value) {
       if (!value) return 0;
-      return String(value.toFixed(2)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      return String(value.toFixed(0)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     },
     formatDateTime(value) {
       if (!value) return '';
@@ -37,6 +37,9 @@ export default {
       if (!total) return 0;
       return ((profit / total) * 100).toFixed(2);
     },
+    formatDate(date) {
+      return dayjs(date).format('DD-MM-YYYY');
+    }
 
 
   },

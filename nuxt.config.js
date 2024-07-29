@@ -94,8 +94,7 @@ export default {
   },
   proxy: {
     "/laravel": {
-      target:
-        "https://glowing-space-meme-r6g447vr9xvfx6xg-80.app.github.dev/api/",
+      target: "https://organic-guide-w95g79r7g7gf5g56-80.app.github.dev/api/",
       pathRewrite: { "^/laravel": "/" },
     },
   },

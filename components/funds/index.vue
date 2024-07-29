@@ -24,9 +24,9 @@
           </a-card>
           <a-tabs default-active-key="1" @change="(e) => handleChangeTab(e)">
             <a-tab-pane tab="1 tháng" key="1"> </a-tab-pane>
-            <a-tab-pane tab="3 tháng" key="2"> </a-tab-pane>
-            <a-tab-pane tab="6 tháng" key="3"> </a-tab-pane>
-            <a-tab-pane tab="1 năm" key="4"> </a-tab-pane>
+            <a-tab-pane tab="3 tháng" key="3"> </a-tab-pane>
+            <a-tab-pane tab="6 tháng" key="6"> </a-tab-pane>
+            <a-tab-pane tab="1 năm" key="12"> </a-tab-pane>
           </a-tabs>
           <canvas id="myChart"></canvas>
         </div>
@@ -38,34 +38,25 @@
 <script>
 import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
+
 export default {
   data() {
     return {
       isActive: 0,
       dataCertificate: [],
-      dataChart: [1, 2, 3, 4, 5, 6, 7],
+      dataChart: [],
       indexChart: 1,
       myChart: null,
       dataLabel: {},
     };
   },
-
   watch: {
-    indexChart(value) {
-      if (value == 1) {
-        this.dataChart = [7, 6, 5, 4, 3, 2, 1];
-      }
-      if (value == 2) {
-        this.dataChart = [37, 36, 34, 35, 33, 32, 31];
-      }
-      if (value == 3) {
-        this.dataChart = [17, 16, 15, 13, 14, 12, 11];
-      }
-      if (value == 4) {
-        this.dataChart = [21, 22, 24, 23, 25, 26, 27];
-      }
-      this.myChart.destroy();
-      this.createChart();
+    dataChart: {
+      handler(val) {
+        this.myChart.destroy();
+        this.createChart();
+      },
+      deep: true,
     },
   },
   mounted() {
@@ -108,9 +99,28 @@ export default {
       this.$store.commit("SET_LOADING", true);
       try {
         const { data } = await this.$axios.get(
-          `/laravel/funds/${id}/history?month=1`,
+          `/laravel/funds/${id}/history?month=${this.indexChart}`,
         );
         if (data.data) {
+          let convertData = data.data.map((item, index) => {
+            if (index === 0) {
+              return (item = {
+                ...item,
+                navCurrent: item.navCurrent,
+                percent: 0,
+              });
+            }
+            return {
+              ...item,
+              navCurrent: item.navCurrent,
+              percent: +(
+                ((data.data[index].navCurrent - data.data[0].navCurrent) /
+                  data.data[0].navCurrent) *
+                100
+              ).toFixed(2),
+            };
+          });
+          this.dataChart = convertData;
           this.$store.commit("SET_LOADING", false);
         } else {
           this.$store.commit("SET_LOADING", false);
@@ -120,39 +130,70 @@ export default {
       }
     },
     handleChangeButton(index) {
-      console.log(index);
       this.isActive = index;
       this.handleCallApiDetail(index);
       this.handleCallApiChart(index);
     },
     handleChangeTab(e) {
       this.indexChart = e;
+      this.handleCallApiChart(this.isActive);
     },
     createChart() {
+      const a = this.dataChart.map((el) => {
+        return el.navCurrent;
+      });
       var ctx = document.getElementById("myChart");
       this.myChart = new Chart(ctx, {
         type: "line",
+
         data: {
-          labels: [
-            "week 1",
-            "week 2",
-            "week 3",
-            "week 4",
-            "week 5",
-            "week 6",
-            "week 7",
-            "week 8",
-          ],
+          labels: this.dataChart.map((el) => {
+            return el.matchedDate;
+          }),
           datasets: [
             {
-              label: "My First Dataset",
-              data: this.dataChart,
-              fill: false,
-              borderColor: "rgb(75, 192, 192)",
+              label: "NAV",
+              data: this.dataChart.map((el) => {
+                return el.navCurrent;
+              }),
+              fill: true,
+              borderColor: "red",
             },
           ],
         },
-        options: {},
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              suggestedMax: Math.max(
+                this.dataChart.map((el) => {
+                  return el.percent;
+                }),
+              ),
+            },
+            x: {
+              type: "category",
+            },
+          },
+          plugins: {
+            tooltip: {
+              enabled: true,
+              mode: "index",
+              intersect: false,
+              callbacks: {
+                title: (tooltipItems) => {
+                  return `${tooltipItems[0].label}`;
+                },
+                label: (tooltipItem) => {
+                  return `Giá hiện tại: ${tooltipItem.raw}`;
+                },
+                afterLabel: (tooltipItem) => {
+                  return `Tỉ lệ tăng trưởng: ${this.dataChart[tooltipItem?.dataIndex]?.percent} %`;
+                },
+              },
+            },
+          },
+        },
       });
       this.myChart.resize(200, 500);
     },
